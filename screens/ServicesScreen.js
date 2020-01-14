@@ -3,15 +3,15 @@ import { View, Text, StyleSheet } from 'react-native';
 
 import MainButton from '../components/MainButton';
 
-const DetailsScreen = props => {
+const ServicesScreen = props => {
     return (
         <View style={styles.screen}>
-            <Text>The Details Screen!</Text>
+            <Text>The Services Screen!</Text>
             <MainButton
                 onPress={() => {
-                    props.navigation.navigate({routeName: 'Check Out'})
+                    props.navigation.navigate({routeName: 'Enter Details'})
                 }}
-            >Check Out</MainButton>
+            >Go to Details</MainButton>
         </View>
     )
 };
@@ -24,4 +24,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default DetailsScreen;
+export default ServicesScreen;
