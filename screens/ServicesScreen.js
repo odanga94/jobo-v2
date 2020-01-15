@@ -1,24 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 
-import MainButton from '../components/MainButton';
 import { PROS } from '../data/pros';
-import defaultStyles from '../constants/default-styles';
-import colors from '../constants/colors';
-
-const renderGridItem = (itemData) => {
-    return (
-        <View style={styles.gridItem}>
-            <Text style={{...defaultStyles.bodyText, color: colors.secondary}}>{itemData.item.title}</Text>
-        </View>
-    )
-}
+import ProGridTile from '../components/ProGridTile';
 
 const formatData = (data, numColumns) => {
     const numberOfFullRows = Math.floor(data.length / numColumns);
     let numberOfElementsLastRow = data.length - (numberOfFullRows * numColumns);
-    while(numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0){
-        data.push({id: 'p' + data.length});
+    while (numberOfElementsLastRow !== numColumns && numberOfElementsLastRow !== 0) {
+        data.push({ id: 'p' + (data.length + 1) });
         numberOfElementsLastRow++;
     }
     return data;
@@ -26,6 +16,23 @@ const formatData = (data, numColumns) => {
 
 
 const ServicesScreen = props => {
+    const renderGridItem = (itemData) => {
+        return (
+            <ProGridTile
+                title={itemData.item.title}
+                imgSrc={itemData.item.imgSrc}
+                onSelect={() => {
+                    props.navigation.navigate({
+                        routeName: 'Enter Details',
+                        params: {
+                            proId: itemData.item.id
+                        }
+                    })
+                }}
+            />
+    
+        )
+    }
     return (
         <FlatList
             numColumns={3}

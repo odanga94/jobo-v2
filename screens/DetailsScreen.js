@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 import MainButton from '../components/MainButton';
+import { PROS } from '../data/pros';
 
 const DetailsScreen = props => {
     return (
@@ -15,6 +16,15 @@ const DetailsScreen = props => {
         </View>
     )
 };
+
+DetailsScreen.navigationOptions = (navigationData) => {
+    const proId = navigationData.navigation.getParam('proId');
+    const selectedPro = PROS.find(pro => pro.id === proId)
+
+    return {
+        title: selectedPro.title
+    }
+}
 
 const styles = StyleSheet.create({
     screen: {

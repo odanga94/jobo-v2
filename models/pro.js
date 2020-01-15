@@ -1,8 +1,8 @@
 class Pro {
-    constructor (id, title, color){
+    constructor (id, title, imgSrc){
         this.id = id;
         this.title = title;
-        this.color = color;
+        this.imgSrc = imgSrc;
     }
 }
 
