@@ -2,12 +2,20 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 import MainButton from '../components/MainButton';
-import { PROS } from '../data/pros';
+import { PROS, PRO_DETAILS } from '../data/pros';
+import ProDetails from '../components/ProDetails';
 
 const DetailsScreen = props => {
+    const proId = props.navigation.getParam('proId');
+    const requiredDetails = PRO_DETAILS.find(detail => detail.proIds.indexOf(proId) >= 0)
     return (
         <View style={styles.screen}>
-            <Text>The Details Screen!</Text>
+            <ProDetails
+                estimateDuration={requiredDetails.estimateDuration}
+                needsTools={requiredDetails.needsTools}
+                needsPicture={requiredDetails.needsPicture}
+                needsDimensions={requiredDetails.needsDimensions}
+            />
             <MainButton
                 onPress={() => {
                     props.navigation.navigate({routeName: 'Check Out'})
