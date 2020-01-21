@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+import { combineReducers, createStore } from 'redux';
+import { Provider } from 'react-redux';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo';
 
 import JoboStackNavigator from './navigation/JoboNavigator';
+import authReducer from './store/reducers/auth';
+import Pro from './models/pro';
 
 const fetchFonts = () => {
   return Font.loadAsync({
@@ -11,20 +15,28 @@ const fetchFonts = () => {
   });
 }
 
+const rootReducer = combineReducers({
+  auth: authReducer
+});
+
+const store = createStore(rootReducer);
+
 export default function App() {
   const [dataLoaded, setDataLoaded] = useState(false);
 
-  if (!dataLoaded){
+  if (!dataLoaded) {
     return (
-      <AppLoading
-        startAsync={fetchFonts}
-        onFinish={() => setDataLoaded(true)}
-        onError={(err) => console.log(err)}
-      />
+        <AppLoading
+          startAsync={fetchFonts}
+          onFinish={() => setDataLoaded(true)}
+          onError={(err) => console.log(err)}
+        />
     )
   }
 
   return (
-    <JoboStackNavigator/>
+    <Provider store={store}>
+      <JoboStackNavigator />
+    </Provider>
   );
 }

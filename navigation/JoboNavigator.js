@@ -11,9 +11,11 @@ import CheckOutScreen from '../screens/CheckOutScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import OrderHistoryScreen from '../screens/OrderHistoryScreen';
 import SupportScreen from '../screens/SupportScreen';
+import MapScreen from '../screens/MapScreen';
 import Colors from '../constants/colors';
 
 const JoboStackNavigator = createStackNavigator({
+    Map: MapScreen,
     Services: ServicesScreen,
     'Enter Details': DetailsScreen,
     'Check Out': CheckOutScreen
@@ -22,7 +24,11 @@ const JoboStackNavigator = createStackNavigator({
         headerStyle: {
             backgroundColor: Platform.OS === 'android' ? Colors.primary : 'white',
         },
-        headerTintColor: Platform.OS === 'android' ? 'white' : Colors.primary
+        headerTintColor: Platform.OS === 'android' ? 'white' : Colors.primary,
+        headerTitleStyle: {
+            fontFamily: 'poppins-regular',
+            fontWeight: 'bold'
+        }
     }
 });
 
@@ -61,8 +67,15 @@ const JoboTabNavigator = createBottomTabNavigator({
     }
 }, {
     tabBarOptions: {
-        activeTintColor: Colors.secondary
+        activeTintColor: Colors.secondary,
+        style: {
+            backgroundColor: Platform.OS === 'android' ? Colors.primary : ''
+        },
+        labelStyle: {
+            fontFamily: 'poppins-regular'
+        }
     }
-})
+});
+
 
 export default createAppContainer(JoboTabNavigator);

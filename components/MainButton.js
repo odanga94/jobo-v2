@@ -23,7 +23,8 @@ const styles = StyleSheet.create({
     buttonText: {
         color: 'white',
         fontFamily: 'poppins-regular',
-        fontSize: 18
+        fontSize: 18,
+        textAlign: 'center'
     }
 });
 
