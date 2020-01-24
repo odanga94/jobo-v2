@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-import MainButton from '../components/MainButton';
+import MainButton from '../components/UI/MainButton';
 import { PROS, PRO_DETAILS } from '../data/pros';
 import ProDetails from '../components/ProDetails';
 

@@ -9,40 +9,60 @@ import ServicesScreen from '../screens/ServicesScreen';
 import DetailsScreen from '../screens/DetailsScreen';
 import CheckOutScreen from '../screens/CheckOutScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import OrderHistoryScreen from '../screens/OrderHistoryScreen';
+import OrdersScreen from '../screens/OrdersScreen';
 import SupportScreen from '../screens/SupportScreen';
 import MapScreen from '../screens/MapScreen';
 import Colors from '../constants/colors';
 
-const JoboStackNavigator = createStackNavigator({
+const defaultStackNavOptions = {
+    headerStyle: {
+        backgroundColor: Platform.OS === 'android' ? Colors.primary : 'white',
+    },
+    headerTintColor: Platform.OS === 'android' ? 'white' : Colors.primary,
+    headerTitleStyle: {
+        fontFamily: 'poppins-regular',
+        fontWeight: 'bold'
+    }
+}
+
+const HomeStackNavigator = createStackNavigator({
     Map: MapScreen,
     Services: ServicesScreen,
     'Enter Details': DetailsScreen,
     'Check Out': CheckOutScreen
 }, {
-    defaultNavigationOptions: {
-        headerStyle: {
-            backgroundColor: Platform.OS === 'android' ? Colors.primary : 'white',
-        },
-        headerTintColor: Platform.OS === 'android' ? 'white' : Colors.primary,
-        headerTitleStyle: {
-            fontFamily: 'poppins-regular',
-            fontWeight: 'bold'
-        }
-    }
+    defaultNavigationOptions: defaultStackNavOptions
+});
+
+const OrdersStackNavigator = createStackNavigator({
+    'Your Orders': OrdersScreen
+}, {
+    defaultNavigationOptions: defaultStackNavOptions
+});
+
+const SupportStackNavigator = createStackNavigator({
+    'Support': SupportScreen
+}, {
+    defaultNavigationOptions: defaultStackNavOptions
+});
+
+const ProfileStackNavigator = createStackNavigator({
+    'My Profile': ProfileScreen
+}, {
+    defaultNavigationOptions: defaultStackNavOptions
 });
 
 const JoboTabNavigator = createBottomTabNavigator({
     Home: {
-        screen: JoboStackNavigator,
+        screen: HomeStackNavigator,
         navigationOptions: {
             tabBarIcon: (tabInfo) => {
                 return <FontAwesome name="home" size={30} color={tabInfo.tintColor} />
-            }
+            },
         }
     },
-    'Order History': {
-        screen: OrderHistoryScreen,
+    'My Orders': {
+        screen: OrdersStackNavigator,
         navigationOptions: {
             tabBarIcon: (tabInfo) => {
                 return <MaterialIcons name="history" size={30} color={tabInfo.tintColor} />
@@ -50,7 +70,7 @@ const JoboTabNavigator = createBottomTabNavigator({
         }
     },
     Support: {
-        screen: SupportScreen,
+        screen: SupportStackNavigator,
         navigationOptions: {
             tabBarIcon: (tabInfo) => {
                 return <MaterialIcons name="help-outline" size={30} color={tabInfo.tintColor} />
@@ -58,7 +78,7 @@ const JoboTabNavigator = createBottomTabNavigator({
         }
     },
     Profile: {
-        screen: ProfileScreen,
+        screen: ProfileStackNavigator,
         navigationOptions: {
             tabBarIcon: (tabInfo) => {
                 return <Ionicons name="md-person" size={30} color={tabInfo.tintColor} />
@@ -74,7 +94,7 @@ const JoboTabNavigator = createBottomTabNavigator({
         labelStyle: {
             fontFamily: 'poppins-regular'
         }
-    }
+    },
 });
 
 

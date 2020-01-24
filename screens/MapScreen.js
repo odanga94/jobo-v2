@@ -2,13 +2,12 @@ import React, { Fragment } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
 
-import Card from '../components/Card';
-import MainButton from '../components/MainButton';
+import Card from '../components/UI/Card';
+import MainButton from '../components/UI/MainButton';
 import defaultStyles from '../constants/default-styles';
 
 const MapScreen = props => {
     const isAuthenticated = useSelector(state => state.auth.isAuth);
-    console.log(isAuthenticated);
     return (
         <Fragment>
             <View style={styles.map}>
@@ -27,7 +26,7 @@ const MapScreen = props => {
 };
 
 MapScreen.navigationOptions = {
-    headerShown: false
+    headerShown: false,
 }
 
 const styles = StyleSheet.create({

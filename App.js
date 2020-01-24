@@ -3,10 +3,11 @@ import { combineReducers, createStore } from 'redux';
 import { Provider } from 'react-redux';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo';
+import { composeWithDevTools } from 'redux-devtools-extension';
 
 import JoboStackNavigator from './navigation/JoboNavigator';
-import authReducer from './store/reducers/auth';
-import Pro from './models/pro';
+import authReducer from './store/reducers/user/auth';
+import ordersReducer from './store/reducers/orders';
 
 const fetchFonts = () => {
   return Font.loadAsync({
@@ -16,10 +17,11 @@ const fetchFonts = () => {
 }
 
 const rootReducer = combineReducers({
-  auth: authReducer
+  auth: authReducer,
+  orders: ordersReducer
 });
 
-const store = createStore(rootReducer);
+const store = createStore(rootReducer, composeWithDevTools());
 
 export default function App() {
   const [dataLoaded, setDataLoaded] = useState(false);

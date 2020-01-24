@@ -1,4 +1,4 @@
-import { IS_AUTH } from '../actions/auth';
+import { IS_AUTH } from '../../actions/user/auth';
 
 const initialState = {
     isAuth: true

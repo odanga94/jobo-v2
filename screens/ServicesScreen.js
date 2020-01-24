@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, FlatList } from 'react-native';
+import { FlatList } from 'react-native';
 
 import { PROS } from '../data/pros';
 import ProGridTile from '../components/ProGridTile';
@@ -41,13 +41,5 @@ const ServicesScreen = props => {
         />
     )
 };
-
-const styles = StyleSheet.create({
-    gridItem: {
-        flex: 1,
-        margin: 15,
-        height: 150
-    }
-})
 
 export default ServicesScreen;
