@@ -15,6 +15,16 @@ const OrdersScreen = props => {
                     problem={itemData.item.problemName}
                     price={itemData.item.totalAmount}
                     date={itemData.item.readableDate}
+                    onViewDetail={() => {
+                        const dateTimeStamp = new Date(itemData.item.id).getTime();
+                        props.navigation.navigate({
+                            routeName: 'OrderDetails',
+                            params: {
+                                orderId: itemData.item.id,
+                                orderTitle: `Order #${dateTimeStamp}`
+                            }
+                        })
+                    }}
                 />
             )}
             keyExtractor={item => item.id}

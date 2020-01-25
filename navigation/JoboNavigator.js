@@ -12,6 +12,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import OrdersScreen from '../screens/OrdersScreen';
 import SupportScreen from '../screens/SupportScreen';
 import MapScreen from '../screens/MapScreen';
+import OrderDetailsScreen from '../screens/OrderDetailsScreen';
 import Colors from '../constants/colors';
 
 const defaultStackNavOptions = {
@@ -29,13 +30,14 @@ const HomeStackNavigator = createStackNavigator({
     Map: MapScreen,
     Services: ServicesScreen,
     'Enter Details': DetailsScreen,
-    'Check Out': CheckOutScreen
+    'Check Out': CheckOutScreen,
 }, {
     defaultNavigationOptions: defaultStackNavOptions
 });
 
 const OrdersStackNavigator = createStackNavigator({
-    'Your Orders': OrdersScreen
+    'Your Orders': OrdersScreen,
+    OrderDetails: OrderDetailsScreen
 }, {
     defaultNavigationOptions: defaultStackNavOptions
 });

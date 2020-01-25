@@ -1,18 +1,29 @@
 import moment from 'moment';
 
 class Order {
-    constructor (id, problemName, service, totalAmount, date, proImage, clientAddress) {
+    constructor(
+        id,
+        problemName,
+        service,
+        totalAmount,
+        date,
+        proName,
+        proImage,
+        clientAddress,
+        mapImage
+    ) {
         this.id = id;
         this.problemName = problemName;
         this.service = service;
         this.proImage = proImage;
         this.totalAmount = totalAmount;
         this.date = date;
+        this.proName = proName;
         this.clientAddress = clientAddress;
-
+        this.mapImage = mapImage
     }
 
-    get readableDate(){
+    get readableDate() {
         /*return this.date.toLocaleDateString('en-EN', {
             year: 'numeric',
             month: 'long',
