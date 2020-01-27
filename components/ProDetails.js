@@ -6,10 +6,11 @@ import {
 } from 'react-native';
 
 import defaultStyles from '../constants/default-styles';
+import Card from '../components/UI/Card';
 
 const ProDetails = props => {
     return (
-        <View style={styles.proDetail}>
+        <Card style={styles.proDetail}>
             <Text style={defaultStyles.bodyText}>
                 Estimate Duration:  <Text style={defaultStyles.titleText}>{props.estimateDuration} day (s)</Text>
             </Text>
@@ -22,7 +23,7 @@ const ProDetails = props => {
             <Text style={defaultStyles.bodyText}>
                 Needs Dimensions:  <Text style={defaultStyles.titleText}>{props.needsDimensions.toString()}</Text>
             </Text>
-        </View>
+        </Card>
 
     )
 }
@@ -31,8 +32,6 @@ const styles = StyleSheet.create({
     proDetail: {
         height: 200,
         width: '95%',
-        backgroundColor: '#ccc',
-        borderRadius: 10,
         marginVertical: 5,
         alignItems: 'center',
         justifyContent: 'space-between',

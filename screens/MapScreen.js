@@ -14,7 +14,7 @@ const MapScreen = props => {
                 <Text>MapView area</Text>
             </View>
             <Card style={styles.card}>
-    <Text style={{...defaultStyles.bodyText, fontWeight: 'bold'}}> User is Authenticated: {isAuthenticated.toString()}</Text>
+                <Text style={{ ...defaultStyles.bodyText, fontWeight: 'bold' }}> User is Authenticated: {isAuthenticated.toString()}</Text>
                 <Text style={defaultStyles.bodyText}>Some Content like announcements and current job</Text>
                 <MainButton onPress={() => {
                     props.navigation.navigate('Services');
@@ -41,7 +41,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginVertical: 10,
-        alignSelf: 'center'
+        alignSelf: 'center',
+        padding: 20
     }
 })
 

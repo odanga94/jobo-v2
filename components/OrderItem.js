@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 
 import Colors from '../constants/colors';
-import MainButton from './UI/MainButton'
+import MainButton from './UI/MainButton';
 
 const { height } = Dimensions.get('window');
 

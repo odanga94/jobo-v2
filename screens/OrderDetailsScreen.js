@@ -27,7 +27,7 @@ const OrderDetailScreen = props => {
                 <Text style={styles.datePrice}>{selectedOrder.readableDate}</Text>
                 <Text style={styles.datePrice}>KES.{selectedOrder.totalAmount.toFixed(2)}</Text>
             </View>
-            <Card style={{ marginHorizontal: 20 }}>
+            <Card style={{ marginHorizontal: 20, padding: 10 }}>
                 <Text style={styles.title}>You requested for a {selectedOrder.service}</Text>
                 <View style={styles.proDetails}>
                     <View style={styles.imageContainer}>
