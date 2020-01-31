@@ -1,13 +1,26 @@
 import React, { useState } from 'react';
-import { combineReducers, createStore } from 'redux';
+import { combineReducers, createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
 import * as Font from 'expo-font';
 import { AppLoading } from 'expo';
 import { composeWithDevTools } from 'redux-devtools-extension';
+import ReduxThunk from 'redux-thunk';
+import * as firebase from 'firebase';
 
 import JoboStackNavigator from './navigation/JoboNavigator';
 import authReducer from './store/reducers/user/auth';
 import ordersReducer from './store/reducers/orders';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAbvDxfinWTNM5cBoZoppej3L6N0pCM13s",
+  authDomain: "jobo-3a84b.firebaseapp.com",
+  databaseURL: "https://jobo-3a84b.firebaseio.com/",
+  storageBucket: "gs://jobo-3a84b.appspot.com"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 const fetchFonts = () => {
   return Font.loadAsync({
@@ -21,7 +34,7 @@ const rootReducer = combineReducers({
   orders: ordersReducer
 });
 
-const store = createStore(rootReducer, composeWithDevTools());
+const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(ReduxThunk)));
 
 export default function App() {
   const [dataLoaded, setDataLoaded] = useState(false);

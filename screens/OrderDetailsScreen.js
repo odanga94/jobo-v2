@@ -21,7 +21,7 @@ const OrderDetailScreen = props => {
 
     return (
         <ScrollView>
-            <Image source={selectedOrder.mapImage} style={styles.image} />
+            <Image source={{uri: selectedOrder.mapImage}} style={styles.image} />
             <Text style={styles.description}>{selectedOrder.clientAddress}</Text>
             <View style={styles.datePriceContainer}>
                 <Text style={styles.datePrice}>{selectedOrder.readableDate}</Text>
@@ -31,7 +31,7 @@ const OrderDetailScreen = props => {
                 <Text style={styles.title}>You requested for a {selectedOrder.service}</Text>
                 <View style={styles.proDetails}>
                     <View style={styles.imageContainer}>
-                        <Image source={selectedOrder.proImage} style={styles.proImage} />
+                        <Image source={{uri: selectedOrder.proImage}} style={styles.proImage} />
                     </View>
                     <View style={styles.proTextContainer}>
                         <Text style={[styles.description, {textAlign: 'left'}]}>Name:  {selectedOrder.proName}</Text>

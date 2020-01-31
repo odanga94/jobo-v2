@@ -22,7 +22,7 @@ const OrderItem = props => {
         <TouchableCmp onPress={props.onViewDetail} useForeground>
             <View style={styles.order}>
                 <View style={styles.imageContainer}>
-                    <Image source={props.image} style={styles.image} /*resizeMode='contain'*/ />
+                    <Image source={{uri: props.image}} style={styles.image} /*resizeMode='contain'*/ />
                 </View>
                 <View style={{height: '20%', marginBottom: 10}}>
                     <Text style={styles.date}>{props.date}</Text>

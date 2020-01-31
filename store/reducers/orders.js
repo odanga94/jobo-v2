@@ -1,32 +1,34 @@
 import Order from '../../models/order';
+import { ADD_ORDER, SET_ORDERS } from '../actions/orders';
 
 const initialState = {
-    orders: [
-        new Order(
-            new Date('Sat Jan 25 2020 10:56:32 GMT+0300 (EAT)').toString(),
-            'Broken Sink',
-            'Plumber',
-            1000,
-            new Date('Sat Jan 25 2020 10:56:32 GMT+0300 (EAT)'),
-            'John Odanga',
-            require('../../assets/proPic.jpg'),
-            'Ngong View Flats, Thiong\'o Road',
-            require('../../assets/mapPic.jpg'),
-        ),
-        new Order(
-            new Date().toString(),
-            'Laundry',
-            'Cleaner',
-            300,
-            new Date(),
-            'Olivia',
-            require('../../assets/proPic.jpg'),
-            'BuruBuru Phase V',
-            require('../../assets/mapPic.jpg'),
-        )
-    ]
+    orders: []
 }
 
 export default (state = initialState, action) => {
+    switch (action.type) {
+        case ADD_ORDER:
+            return {
+                ...state,
+                orders: state.orders.concat(
+                    new Order(
+                        action.orderData.orderId,
+                        action.orderData.problemName,
+                        action.orderData.service,
+                        action.orderData.totalAmount,
+                        action.orderData.date,
+                        action.orderData.proName,
+                        action.orderData.proImage,
+                        action.orderData.clientAddress,
+                        action.orderData.mapImage
+                    ),
+                )
+            }
+        case SET_ORDERS:
+            return {
+                ...state,
+                orders: action.orders
+            }
+    }
     return state;
 }
