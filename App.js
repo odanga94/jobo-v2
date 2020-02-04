@@ -7,7 +7,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import ReduxThunk from 'redux-thunk';
 import * as firebase from 'firebase';
 
-import JoboStackNavigator from './navigation/JoboNavigator';
+import JoboNavigator from './navigation/JoboNavigator';
 import authReducer from './store/reducers/user/auth';
 import ordersReducer from './store/reducers/orders';
 
@@ -51,7 +51,7 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <JoboStackNavigator />
+      <JoboNavigator />
     </Provider>
   );
 }

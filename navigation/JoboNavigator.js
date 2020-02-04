@@ -1,9 +1,9 @@
 import React from 'react';
 import { Platform } from 'react-native';
-import { createAppContainer } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from 'react-navigation-tabs';
-import { Ionicons, MaterialIcons, FontAwesome} from '@expo/vector-icons';
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 
 import ServicesScreen from '../screens/ServicesScreen';
 import DetailsScreen from '../screens/DetailsScreen';
@@ -13,6 +13,7 @@ import OrdersScreen from '../screens/OrdersScreen';
 import SupportScreen from '../screens/SupportScreen';
 import MapScreen from '../screens/MapScreen';
 import OrderDetailsScreen from '../screens/OrderDetailsScreen';
+import AuthScreen from '../screens/AuthScreen';
 import Colors from '../constants/colors';
 
 const defaultStackNavOptions = {
@@ -99,5 +100,16 @@ const JoboTabNavigator = createBottomTabNavigator({
     },
 });
 
+const AuthNavigator = createStackNavigator({
+    Auth: AuthScreen
+}, {
+    defaultNavigationOptions: defaultStackNavOptions
+});
 
-export default createAppContainer(JoboTabNavigator);
+const MainNavigator = createSwitchNavigator({
+    Auth: AuthNavigator,
+    App: JoboTabNavigator
+})
+
+
+export default createAppContainer(MainNavigator);

@@ -6,7 +6,9 @@ export const SET_ORDERS = 'SET_ORDERS';
 
 export const fetchOrders = () => {
     return async dispatch => {
+        try {
             const dataSnapshot = await firebase.database().ref('orders/u1').once('value');
+            //console.log(dataSnapshot);
             const resData = dataSnapshot.val();
             //console.log(resData);
 
@@ -28,8 +30,11 @@ export const fetchOrders = () => {
             dispatch({
                 type: SET_ORDERS,
                 orders: loadedOrders
-            })
-        } 
+            });
+        } catch (err){
+            throw new Error('Something went wrong 😞');
+        }    
+        }
 }
 
 export const addOrder = (problemName, service, totalAmount, proName, proImage, clientAddress, mapImage) => {
