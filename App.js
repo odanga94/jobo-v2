@@ -36,7 +36,7 @@ const rootReducer = combineReducers({
 
 const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(ReduxThunk)));
 
-export default function App() {
+export default function App () {
   const [dataLoaded, setDataLoaded] = useState(false);
 
   if (!dataLoaded) {

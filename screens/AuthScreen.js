@@ -10,13 +10,17 @@ import {
     TouchableOpacity,
     TouchableNativeFeedback,
     Platform,
-    Alert
+    Alert,
+    ActivityIndicator
 } from 'react-native';
+import { useDispatch } from 'react-redux';
 
 import Input from '../components/UI/Input';
 import MainButton from '../components/UI/MainButton';
+import Spinner from '../components/UI/Spinner';
 import Colors from '../constants/colors';
 import DefaultStyles from '../constants/default-styles';
+import * as authActions from '../store/actions/user/auth';
 
 
 const { height } = Dimensions.get("window");
@@ -47,6 +51,7 @@ const formReducer = (state, action) => {
 
 const AuthScreen = props => {
     const [isSignUp, setIsSignUp] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [formState, dispatchFormState] = useReducer(formReducer, {
         inputValues: {
             email: '',
@@ -58,6 +63,7 @@ const AuthScreen = props => {
         },
         formIsValid: false
     });
+    const dispatch = useDispatch();
 
     const inputChangeHandler = useCallback((inputLabel, value, validity) => {
         dispatchFormState({
@@ -68,10 +74,30 @@ const AuthScreen = props => {
         })
     }, [dispatchFormState]);
 
-    const authHandler = () => {
+    const authHandler = async () => {
         if (!formState.formIsValid) {
             Alert.alert('Wrong Input!', 'Please check the errors in the form.', [{ text: 'Okay' }]);
             return;
+        }
+        if (isSignUp) {
+            setIsLoading(true);
+            try {
+                await dispatch(authActions.signUp(formState.inputValues.email, formState.inputValues.password));
+                props.navigation.navigate('App');
+            } catch (err) {
+                Alert.alert('An error occurred!', err.message, [{ text: 'Okay' }]);
+                setIsLoading(false);
+            }
+
+        } else {
+            setIsLoading(true);
+            try {
+                await dispatch(authActions.logIn(formState.inputValues.email, formState.inputValues.password));
+                props.navigation.navigate('App');
+            } catch (err) {
+                Alert.alert('An error occurred!', err.message, [{ text: 'Okay' }]);
+                setIsLoading(false);
+            }
         }
     }
 
@@ -153,13 +179,16 @@ const AuthScreen = props => {
                                     style={styles.textInput}
                                 />
                             </Fragment>
-                        : null
+                            : null
                     }
                 </ScrollView>
             </KeyboardAvoidingView>
-            <MainButton onPress={authHandler}>
-                {isSignUp ? 'Sign Up' : 'Log In'}
-            </MainButton>
+            {!isLoading ?
+                <MainButton onPress={authHandler}>
+                    {isSignUp ? 'Sign Up' : 'Log In'}
+                </MainButton> :
+                <Spinner />
+            }
             <View style={{ paddingHorizontal: 30, bottom: -10 }}>
                 <Text style={styles.terms}>By signing up, you agree to our Terms and Conditions and Privacy Policy</Text>
             </View>

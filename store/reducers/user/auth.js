@@ -1,12 +1,19 @@
-import { IS_AUTH } from '../../actions/user/auth';
+import { AUTHENTICATE, LOG_OUT } from '../../actions/user/auth';
 
 const initialState = {
-    isAuth: true
+    userId: null
 }
 
 const authReducer = (state = initialState, action) => {
-    return {
-        ...state
+    switch (action.type){
+        case AUTHENTICATE:
+            return {
+                userId: action.userId
+            }
+        case LOG_OUT:
+            return initialState
+        default:
+            return state;
     }
 }
 

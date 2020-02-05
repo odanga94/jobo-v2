@@ -14,6 +14,7 @@ import SupportScreen from '../screens/SupportScreen';
 import MapScreen from '../screens/MapScreen';
 import OrderDetailsScreen from '../screens/OrderDetailsScreen';
 import AuthScreen from '../screens/AuthScreen';
+import StartUpScreen from '../screens/StartUpScreen';
 import Colors from '../constants/colors';
 
 const defaultStackNavOptions = {
@@ -107,6 +108,7 @@ const AuthNavigator = createStackNavigator({
 });
 
 const MainNavigator = createSwitchNavigator({
+    StartUp: StartUpScreen,
     Auth: AuthNavigator,
     App: JoboTabNavigator
 })
