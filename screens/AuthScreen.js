@@ -1,4 +1,4 @@
-import React, { useState, Fragment, useReducer, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
     KeyboardAvoidingView,
     ScrollView,
@@ -11,78 +11,36 @@ import {
     TouchableNativeFeedback,
     Platform,
     Alert,
-    ActivityIndicator
 } from 'react-native';
 import { useDispatch } from 'react-redux';
 
-import Input from '../components/UI/Input';
 import MainButton from '../components/UI/MainButton';
 import Spinner from '../components/UI/Spinner';
 import Colors from '../constants/colors';
 import DefaultStyles from '../constants/default-styles';
 import * as authActions from '../store/actions/user/auth';
+import SignInWithEmailForm from '../components/SignInWithEmailForm';
+import SignUpWithEmailForm from '../components/SignUpWithEmailForm';
 
 
 const { height } = Dimensions.get("window");
 
-const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
-const formReducer = (state, action) => {
-    if (action.type === FORM_INPUT_UPDATE) {
-        let updatedFormIsValid = true;
-        const updatedValues = {
-            ...state.inputValues,
-            [action.inputLabel]: action.value
-        };
-        const updatedInputValidities = {
-            ...state.inputValidities,
-            [action.inputLabel]: action.isValid
-        };
-        for (let key in updatedInputValidities) {
-            updatedFormIsValid = updatedFormIsValid && updatedInputValidities[key];
-        }
-        return {
-            inputValues: updatedValues,
-            inputValidities: updatedInputValidities,
-            formIsValid: updatedFormIsValid
-        }
-    }
-    return state;
-}
-
 const AuthScreen = props => {
     const [isSignUp, setIsSignUp] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [formState, dispatchFormState] = useReducer(formReducer, {
-        inputValues: {
-            email: '',
-            password: '',
-        },
-        inputValidities: {
-            email: false,
-            password: false,
-        },
-        formIsValid: false
-    });
+    const [formIsValid, setFormIsValid] = useState(false);
+    const [credentials, setCredentials] = useState();
     const dispatch = useDispatch();
 
-    const inputChangeHandler = useCallback((inputLabel, value, validity) => {
-        dispatchFormState({
-            type: FORM_INPUT_UPDATE,
-            value,
-            isValid: validity,
-            inputLabel
-        })
-    }, [dispatchFormState]);
-
-    const authHandler = async () => {
-        if (!formState.formIsValid) {
+    const authHandler = async (credentials) => {
+        if (!formIsValid) {
             Alert.alert('Wrong Input!', 'Please check the errors in the form.', [{ text: 'Okay' }]);
             return;
         }
         if (isSignUp) {
             setIsLoading(true);
             try {
-                await dispatch(authActions.signUp(formState.inputValues.email, formState.inputValues.password));
+                await dispatch(authActions.signUp(credentials.email, credentials.password, credentials.name, credentials.phone));
                 props.navigation.navigate('App');
             } catch (err) {
                 Alert.alert('An error occurred!', err.message, [{ text: 'Okay' }]);
@@ -92,7 +50,7 @@ const AuthScreen = props => {
         } else {
             setIsLoading(true);
             try {
-                await dispatch(authActions.logIn(formState.inputValues.email, formState.inputValues.password));
+                await dispatch(authActions.logIn(credentials.email, credentials.password));
                 props.navigation.navigate('App');
             } catch (err) {
                 Alert.alert('An error occurred!', err.message, [{ text: 'Okay' }]);
@@ -125,66 +83,22 @@ const AuthScreen = props => {
                             </View>
                         </TouchableCmp>
                     </View>
-                    <Input
-                        id="email"
-                        label="E-mail:"
-                        keyboardType="email-address"
-                        required
-                        email
-                        autoCapitalize="none"
-                        errorText="Please enter a valid email address."
-                        onInputChange={inputChangeHandler}
-                        initialValue="ag451157.john@gmail.com"
-                        style={styles.textInput}
-                    />
-                    <Input
-                        id="password"
-                        label="Password:"
-                        keyboardType="default"
-                        secureTextEntry
-                        required
-                        minLength={6}
-                        autoCapitalize="none"
-                        errorText="Please enter a valid password."
-                        onInputChange={inputChangeHandler}
-                        initialValue="123456"
-                        style={styles.textInput}
-                    />
                     {
                         isSignUp ?
-                            <Fragment>
-                                <Input
-                                    id="confirm-password"
-                                    label="Confirm Password:"
-                                    keyboardType="default"
-                                    secureTextEntry
-                                    required
-                                    minLength={6}
-                                    autoCapitalize="none"
-                                    errorText="Passwords do not match"
-                                    onInputChange={() => { }}
-                                    initialValue="123456"
-                                    style={styles.textInput}
-                                />
-                                <Input
-                                    id="name"
-                                    label="Name:"
-                                    keyboardType="default"
-                                    required
-                                    minLength={5}
-                                    autoCapitalize="none"
-                                    errorText="Please enter a valid name."
-                                    onInputChange={() => { }}
-                                    initialValue="John Odanga"
-                                    style={styles.textInput}
-                                />
-                            </Fragment>
-                            : null
+                            <SignUpWithEmailForm
+                                setFormIsValid={setFormIsValid}
+                                setCredentials={setCredentials}
+                            /> :
+                            <SignInWithEmailForm
+                                setFormIsValid={setFormIsValid}
+                                setCredentials={setCredentials}
+                            />
                     }
+
                 </ScrollView>
             </KeyboardAvoidingView>
             {!isLoading ?
-                <MainButton onPress={authHandler}>
+                <MainButton onPress={() => { authHandler(credentials) }}>
                     {isSignUp ? 'Sign Up' : 'Log In'}
                 </MainButton> :
                 <Spinner />

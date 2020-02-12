@@ -23,12 +23,22 @@ export const authenticate = (userId) => {
     }
 }
 
-export const signUp = (email, password) => {
+export const signUp = (email, password, name, phone) => {
     return async dispatch => {
         try {
             const response = await firebase.auth().createUserWithEmailAndPassword(email, password);
-            //console.log(response);
-            dispatch(authenticate(response.user.uid));
+            const date = new Date().toString()
+            await firebase.database().ref(`user_profiles/${response.user.uid}`)
+                .set({
+                    name: name,
+                    phone: phone,
+                    created_At: date
+                }).then((res) => {
+                    //console.log(res);
+                    dispatch(authenticate(response.user.uid));
+                }).catch(err => {
+                    throw new Error(err);
+                })        
         } catch (error){
             throw new Error(error);
         }

@@ -15,7 +15,7 @@ const inputReducer = (state, action) => {
                 ...state,
                 value: action.value,
                 isValid: action.isValid,
-                touched: true
+                //touched: true
             }
         case INPUT_BLUR:
             return {
@@ -58,6 +58,12 @@ const Input = props => {
             isValid = false;
         }
         if (props.minLength != null && text.length < props.minLength) {
+            isValid = false;
+        }
+        if (props.maxLength != null && text.length > props.maxLength) {
+            isValid = false;
+        }
+        if (props.id === "confirmPassword" && text !== props.passwordValue){
             isValid = false;
         }
         dispatch({ type: INPUT_CHANGE, value: text, isValid })
