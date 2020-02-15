@@ -10,6 +10,7 @@ import * as firebase from 'firebase';
 import JoboNavigator from './navigation/JoboNavigator';
 import authReducer from './store/reducers/user/auth';
 import ordersReducer from './store/reducers/orders';
+import profileReducer from './store/reducers/user/profile';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAbvDxfinWTNM5cBoZoppej3L6N0pCM13s",
@@ -31,7 +32,8 @@ const fetchFonts = () => {
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  orders: ordersReducer
+  orders: ordersReducer,
+  profile: profileReducer
 });
 
 const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(ReduxThunk)));
