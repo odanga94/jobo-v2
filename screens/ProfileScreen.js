@@ -17,6 +17,8 @@ import {
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
+import  * as Permissions from 'expo-permissions';
+import * as ImgPicker from 'expo-image-picker';
 
 import * as authActions from '../store/actions/user/auth';
 import * as profileActions from '../store/actions/user/profile';
@@ -56,6 +58,7 @@ const ProfileScreen = props => {
     const [isLoading, setIsLoading] = useState(false);
     const [profileLoading, setProfileLoading] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
+    const [pickedImage, setPickedImage] = useState();
     const [formState, dispatchFormState] = useReducer(formReducer, {
         inputValues: {
             name: '',
@@ -67,10 +70,11 @@ const ProfileScreen = props => {
         },
         formIsValid: false
     });
+
     const userId = useSelector(state => state.auth.userId);
-    const profileData = useSelector(state => state.profile.profileData);
-    const imageUrl = useSelector(state => state.profile.imageUrl);
+    const { name, phone, imageUri } = useSelector(state => state.profile);
     const dispatch = useDispatch();
+    
 
     const logOutHandler = async () => {
         setIsLoading(true);
@@ -79,6 +83,7 @@ const ProfileScreen = props => {
     }
 
     const toggleEditMode = useCallback(value => {
+        setPickedImage(null);
         if (value === false) {
             setIsEditMode(false);
             return;
@@ -94,7 +99,19 @@ const ProfileScreen = props => {
         const fetchProfile = async () => {
             try {
                 setProfileLoading(true);
-                await dispatch(profileActions.fetchProfile(userId));
+                const userData = await dispatch(profileActions.fetchProfile(userId));
+                dispatchFormState({
+                    type: FORM_INPUT_UPDATE,
+                    value: userData.name,
+                    isValid: true,
+                    inputLabel: "name"
+                });
+                dispatchFormState({
+                    type: FORM_INPUT_UPDATE,
+                    value: userData.phone,
+                    isValid: true,
+                    inputLabel: "phone"
+                });
             } catch (err) {
                 Alert.alert('An error occurred!', err.message, [{ text: 'Okay' }]);
             }
@@ -112,11 +129,56 @@ const ProfileScreen = props => {
         });
     }, [dispatchFormState]);
 
-    const saveProfileHandler = () => {
+    const verifyPermissions = async () => {
+        const result = await Permissions.askAsync(Permissions.CAMERA, Permissions.CAMERA_ROLL);
+        if (result.status !== 'granted') {
+            Alert.alert(
+                'Insufficient Permissions!',
+                'You need to grant camera permissions to take a picture',
+                [{ text: 'Okay' }]
+            );
+            return false;
+        }
+        return true;
+    }
+    const takePictureHandler = async () => {
+        if (!isEditMode) {
+            return;
+        }
+        const hasPermissions = await verifyPermissions();
+        if (!hasPermissions) {
+            return;
+        }
+        const image = await ImgPicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.5
+        });
+        if (image.uri) {
+            setPickedImage(image.uri);
+        }
+    }
+
+    const saveProfileHandler = async () => {
         if (!formState.formIsValid) {
             Alert.alert('Wrong Input!', 'Please check the errors in the form.', [{ text: 'Okay' }]);
             return;
         }
+        try {
+            setIsEditMode(false);
+            setProfileLoading(true);
+            let userData = formState.inputValues;
+            if (pickedImage){
+                userData = {
+                    ...formState.inputValues,
+                    imageUri: pickedImage
+                }
+            }
+            await dispatch(profileActions.editProfile(userId, userData));
+        } catch (err){
+            Alert.alert('An error occurred!', err.message, [{ text: 'Okay' }]);
+        }
+        setProfileLoading(false);
     }
 
     return (
@@ -124,16 +186,16 @@ const ProfileScreen = props => {
             <View>
                 <View style={styles.profileContainer}>
                     <View>
-                        <View style={styles.imageContainer}>
+                        <View style={styles.imageContainer} >
                             {
-                                imageUrl ?
-                                    <Image source={{ uri: imageUrl }} style={styles.image} /> :
+                                imageUri ?
+                                    <Image source={{ uri: imageUri }} style={styles.image} /> :
                                     <Ionicons size={height / 8} name="ios-person" color="#505050" />
                             }
                         </View>
                         {
                             isEditMode ?
-                                <TouchableOpacity style={{ alignSelf: "center" }}>
+                                <TouchableOpacity style={{ alignSelf: "center" }} onPress={takePictureHandler}>
                                     <MaterialCommunityIcons size={23} color={Colors.secondary} name="image-plus" />
                                 </TouchableOpacity> :
                                 null
@@ -154,7 +216,7 @@ const ProfileScreen = props => {
                                         autoCapitalize="none"
                                         errorText="Please enter a valid name."
                                         onInputChange={inputChangeHandler}
-                                        initialValue="John Odanga"
+                                        initialValue={name ? name : ""}
                                         style={styles.textInput}
                                     />
                                     <Input
@@ -167,14 +229,14 @@ const ProfileScreen = props => {
                                         autoCapitalize="none"
                                         errorText="Please enter a valid phone number."
                                         onInputChange={inputChangeHandler}
-                                        initialValue="0799848807"
+                                        initialValue={phone ? phone : ""}
                                         style={styles.textInput}
                                     />
                                 </Fragment>
                                 :
                                 <Fragment>
-                                    <Text style={{ ...DefaultStyles.bodyText, fontSize: 16 }}>{profileData.name}</Text>
-                                    <Text style={{ ...DefaultStyles.bodyText, fontSize: 16 }}>{profileData.phone}</Text>
+                                    <Text style={{ ...DefaultStyles.bodyText, fontSize: 16 }}>{name ? name : ""}</Text>
+                                    <Text style={{ ...DefaultStyles.bodyText, fontSize: 16 }}>{phone ? phone : ""}</Text>
                                 </Fragment>
                         }
                     </View>
