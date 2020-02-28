@@ -11,6 +11,7 @@ const OrdersScreen = props => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
     const orders = useSelector(state => state.orders.orders);
+    const userLocation = useSelector(state => state.location.userLocation);
     const dispatch = useDispatch();
 
     const loadOrders = useCallback(async () => {
