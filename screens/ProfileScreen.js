@@ -1,10 +1,10 @@
-import React, { 
-    useState, 
-    useEffect, 
-    Fragment, 
+import React, {
+    useState,
+    useEffect,
+    Fragment,
     useCallback,
     useReducer
- } from 'react';
+} from 'react';
 import {
     View,
     Text,
@@ -12,13 +12,16 @@ import {
     Dimensions,
     Alert,
     Image,
-    TouchableOpacity
+    TouchableOpacity,
+    Platform,
+    ActionSheetIOS
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
-import  * as Permissions from 'expo-permissions';
+import * as Permissions from 'expo-permissions';
 import * as ImgPicker from 'expo-image-picker';
+import { ActionSheet } from 'native-base';
 
 import * as authActions from '../store/actions/user/auth';
 import * as profileActions from '../store/actions/user/profile';
@@ -74,7 +77,7 @@ const ProfileScreen = props => {
     const userId = useSelector(state => state.auth.userId);
     const { name, phone, imageUri } = useSelector(state => state.profile);
     const dispatch = useDispatch();
-    
+
 
     const logOutHandler = async () => {
         setIsLoading(true);
@@ -141,7 +144,7 @@ const ProfileScreen = props => {
         }
         return true;
     }
-    const takePictureHandler = async () => {
+    const editPictureHandler = async (config) => {
         if (!isEditMode) {
             return;
         }
@@ -149,13 +152,70 @@ const ProfileScreen = props => {
         if (!hasPermissions) {
             return;
         }
-        const image = await ImgPicker.launchCameraAsync({
-            allowsEditing: true,
-            aspect: [4, 3],
-            quality: 0.5
-        });
+        let image;
+        if (config === 'launch-camera') {
+            image = await ImgPicker.launchCameraAsync({
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 0.5
+            });
+        } else {
+            image = await ImgPicker.launchImageLibraryAsync({
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 0.5
+            });
+        }
         if (image.uri) {
             setPickedImage(image.uri);
+        }
+    }
+
+    const launchCameraActionSheet = () => {
+        let buttons = ["Take Picture", "Choose from Gallery", "Delete Profile Picture", "Cancel"];
+        const DESTRUCTIVE_INDEX = 2;
+        const CANCEL_INDEX = 3;
+        if (!imageUri) {
+            buttons = ["Take Picture", "Choose from Gallery", "Cancel"];
+        }
+        const buttonOptions = {
+            options: buttons,
+            cancelButtonIndex: CANCEL_INDEX,
+            destructiveButtonIndex: DESTRUCTIVE_INDEX,
+            title: "Edit Image"
+        }
+        const handleClicked = async (buttonIndexNumber) => {
+            switch (buttonIndexNumber) {
+                case 0:
+                    editPictureHandler('launch-camera');
+                    return;
+                case 1:
+                    editPictureHandler('launch-gallery');
+                    return;
+                case 2:
+                    if (!imageUri){
+                        return;
+                    }
+                    try {
+                        await dispatch(profileActions.deleteProfilePic(userId));
+                        setPickedImage(null);
+                    } catch(err) {
+                        Alert.alert('An error occurred!', err.message, [{ text: 'Okay' }]);
+                    }
+                default:
+                    return
+            }
+        }
+        if (Platform.OS === 'ios') {
+            ActionSheetIOS.showActionSheetWithOptions(
+                buttonOptions,
+                handleClicked,
+            )
+        } else {
+            ActionSheet.show(
+                buttonOptions,
+                handleClicked
+            );
         }
     }
 
@@ -168,14 +228,14 @@ const ProfileScreen = props => {
             setIsEditMode(false);
             setProfileLoading(true);
             let userData = formState.inputValues;
-            if (pickedImage){
+            if (pickedImage) {
                 userData = {
                     ...formState.inputValues,
                     imageUri: pickedImage
                 }
             }
             await dispatch(profileActions.editProfile(userId, userData));
-        } catch (err){
+        } catch (err) {
             Alert.alert('An error occurred!', err.message, [{ text: 'Okay' }]);
         }
         setProfileLoading(false);
@@ -188,14 +248,16 @@ const ProfileScreen = props => {
                     <View>
                         <View style={styles.imageContainer} >
                             {
-                                imageUri ?
-                                    <Image source={{ uri: imageUri }} style={styles.image} /> :
-                                    <Ionicons size={height / 8} name="ios-person" color="#505050" />
+                                isEditMode && pickedImage ?
+                                    <Image source={{ uri: pickedImage }} style={styles.image} /> :
+                                    imageUri ?
+                                        <Image source={{ uri: imageUri }} style={styles.image} /> :
+                                        <Ionicons size={height / 8} name="ios-person" color="#505050" />
                             }
                         </View>
                         {
                             isEditMode ?
-                                <TouchableOpacity style={{ alignSelf: "center" }} onPress={takePictureHandler}>
+                                <TouchableOpacity style={{ alignSelf: "center" }} onPress={launchCameraActionSheet}>
                                     <MaterialCommunityIcons size={23} color={Colors.secondary} name="image-plus" />
                                 </TouchableOpacity> :
                                 null

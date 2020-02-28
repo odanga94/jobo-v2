@@ -6,6 +6,7 @@ import { AppLoading } from 'expo';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import ReduxThunk from 'redux-thunk';
 import * as firebase from 'firebase';
+import { Root } from 'native-base';
 
 import JoboNavigator from './navigation/JoboNavigator';
 import authReducer from './store/reducers/user/auth';
@@ -53,7 +54,9 @@ export default function App () {
 
   return (
     <Provider store={store}>
-      <JoboNavigator />
+      <Root>
+        <JoboNavigator />
+      </Root>
     </Provider>
   );
 }

@@ -1,4 +1,4 @@
-import { FETCH_PROFILE, EDIT_PROFILE, UPDATE_IMAGE} from '../../actions/user/profile';
+import { FETCH_PROFILE, EDIT_PROFILE, UPDATE_IMAGE, DELETE_IMAGE} from '../../actions/user/profile';
 
 const initialState = {
     name: "",
@@ -24,6 +24,11 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 imageUri: action.imageUri
+            }
+        case DELETE_IMAGE: 
+            return {
+                ...state,
+                imageUri: ""
             }
         default:
             return state
