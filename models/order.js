@@ -10,7 +10,7 @@ class Order {
         proName,
         proImage,
         clientAddress,
-        mapImage
+        clientLocation
     ) {
         this.id = id;
         this.problemName = problemName;
@@ -20,7 +20,7 @@ class Order {
         this.date = date;
         this.proName = proName;
         this.clientAddress = clientAddress;
-        this.mapImage = mapImage
+        this.clientLocation = clientLocation
     }
 
     get readableDate() {

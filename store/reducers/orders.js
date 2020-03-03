@@ -20,7 +20,7 @@ export default (state = initialState, action) => {
                         action.orderData.proName,
                         action.orderData.proImage,
                         action.orderData.clientAddress,
-                        action.orderData.mapImage
+                        action.orderData.clientLocation
                     ),
                 )
             }

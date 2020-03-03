@@ -12,16 +12,22 @@ import { useSelector } from 'react-redux';
 
 import Card from '../components/UI/Card';
 import Colors from '../constants/colors';
+import ENV from '../env';
 
 const { height } = Dimensions.get('window');
 
 const OrderDetailScreen = props => {
     const orderId = props.navigation.getParam('orderId');
     const selectedOrder = useSelector(state => state.orders.orders.find(order => order.id === orderId));
+    let imagePreviewUrl;
+    if (selectedOrder.clientLocation) {
+        const location = selectedOrder.clientLocation
+        imagePreviewUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${location.lat},${location.lng}&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:%7C${location.lat},${location.lng}&key=${ENV.googleApiKey}`
+    }
 
     return (
         <ScrollView>
-            <Image source={{uri: selectedOrder.mapImage}} style={styles.image} />
+            <Image source={{uri: imagePreviewUrl}} style={styles.image} />
             <Text style={styles.description}>{selectedOrder.clientAddress}</Text>
             <View style={styles.datePriceContainer}>
                 <Text style={styles.datePrice}>{selectedOrder.readableDate}</Text>
@@ -76,6 +82,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         textAlign: 'center',
         marginHorizontal: 20,
+        marginTop: 5,
         fontFamily: 'poppins-regular'
     },
     imageContainer: {

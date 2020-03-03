@@ -84,7 +84,7 @@ const MapScreen = props => {
             </MapView>
             <Card style={styles.card}>
                 <Text style={{ ...defaultStyles.bodyText, fontWeight: 'bold' }}> User ID is: {userId}</Text>
-                <Text style={defaultStyles.bodyText}>Some Content like announcements and current job</Text>
+                <Text style={defaultStyles.bodyText}>Get 25% discount on your next order!! Valid until 03/04/2020</Text>
                 <MainButton onPress={() => {
                     props.navigation.navigate('Services');
                 }}>View Services</MainButton>

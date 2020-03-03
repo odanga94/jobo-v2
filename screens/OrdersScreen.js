@@ -10,6 +10,8 @@ import ErrorMessage from '../components/ErrorMessage';
 const OrdersScreen = props => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
+
+    const userId = useSelector(state => state.auth.userId)
     const orders = useSelector(state => state.orders.orders);
     const userLocation = useSelector(state => state.location.userLocation);
     const dispatch = useDispatch();
@@ -18,33 +20,36 @@ const OrdersScreen = props => {
         setError(null);
         setIsLoading(true);
         try {
-            await dispatch(orderActions.fetchOrders());
+            await dispatch(orderActions.fetchOrders(userId));
         } catch (err) {
             setError(err.message);
             console.log(err);
         }
         setIsLoading(false);
-    }, [dispatch, setIsLoading]);
+    }, [dispatch, setIsLoading, setError, userId]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         /*dispatch(orderActions.addOrder(
+            userId,
             'Broken Sink',
             'Plumber',
             1000,
             'John Odanga',
             'https://firebasestorage.googleapis.com/v0/b/jobo-3a84b.appspot.com/o/proPic.jpg?alt=media&token=63fe6e15-9529-432b-b6e5-74d792b5211d',
-            'Ngong View Flats, Thiong\'o Road',
-            'https://firebasestorage.googleapis.com/v0/b/jobo-3a84b.appspot.com/o/mapPic.jpg?alt=media&token=9ee9f8da-d587-4b73-9d8d-4c24d8f36009'
+            userLocation
         ));
         dispatch(orderActions.addOrder(
+            userId,
             'Laundry',
             'Cleaner',
              300,
              'Olivia',
             'https://firebasestorage.googleapis.com/v0/b/jobo-3a84b.appspot.com/o/proPic.jpg?alt=media&token=63fe6e15-9529-432b-b6e5-74d792b5211d',
-            'BuruBuru Phase V',
-            'https://firebasestorage.googleapis.com/v0/b/jobo-3a84b.appspot.com/o/mapPic.jpg?alt=media&token=9ee9f8da-d587-4b73-9d8d-4c24d8f36009'
-        ));*/
+            userLocation,
+        ));
+    }, [userId, userLocation, dispatch]);*/
+
+    useEffect(() => {
         loadOrders();
     }, [dispatch, loadOrders]);
 
@@ -64,6 +69,7 @@ const OrdersScreen = props => {
     if (error) {
         return <ErrorMessage retry={loadOrders} error={error} />
     }
+    //console.log(userLocation);
 
     return (
         <FlatList
@@ -77,7 +83,6 @@ const OrdersScreen = props => {
                     price={itemData.item.totalAmount}
                     date={itemData.item.readableDate}
                     onViewDetail={() => {
-                        const dateTimeStamp = new Date(itemData.item.id).getTime();
                         props.navigation.navigate({
                             routeName: 'OrderDetails',
                             params: {
