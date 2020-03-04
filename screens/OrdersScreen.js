@@ -38,7 +38,7 @@ const OrdersScreen = props => {
             'https://firebasestorage.googleapis.com/v0/b/jobo-3a84b.appspot.com/o/proPic.jpg?alt=media&token=63fe6e15-9529-432b-b6e5-74d792b5211d',
             userLocation
         ));
-        dispatch(orderActions.addOrder(
+        /* dispatch(orderActions.addOrder(
             userId,
             'Laundry',
             'Cleaner',
@@ -46,7 +46,7 @@ const OrdersScreen = props => {
              'Olivia',
             'https://firebasestorage.googleapis.com/v0/b/jobo-3a84b.appspot.com/o/proPic.jpg?alt=media&token=63fe6e15-9529-432b-b6e5-74d792b5211d',
             userLocation,
-        ));
+        )); 
     }, [userId, userLocation, dispatch]);*/
 
     useEffect(() => {
@@ -76,6 +76,7 @@ const OrdersScreen = props => {
             onRefresh={loadOrders}
             refreshing={isLoading}
             data={orders}
+            keyExtractor={item => item.id}
             renderItem={itemData => (
                 <OrderItem
                     image={itemData.item.proImage}

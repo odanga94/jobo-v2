@@ -1,28 +1,29 @@
 import React, { Fragment, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions, Alert } from 'react-native';
+import { Text, StyleSheet, Alert, Image } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import * as Permissions from 'expo-permissions';
 import * as Location from 'expo-location';
 import MapView, { Marker } from 'react-native-maps';
+import * as firebase from 'firebase';
 
 import Card from '../components/UI/Card';
 import MainButton from '../components/UI/MainButton';
 import defaultStyles from '../constants/default-styles';
 import * as locationActions from '../store/actions/location';
-
-const { height } = Dimensions.get('window');
+//import prosLocs from '../data/markers';
 
 const MapScreen = props => {
     const [isFetchingLocation, setIsFetchingLocation] = useState(false);
     const [currentLocationRegion, setCurrentLocationRegion] = useState();
+    const [prosLocations, setProsLocations] = useState();
 
     const dispatch = useDispatch();
     const userId = useSelector(state => state.auth.userId);
 
-    let markerCoordinate = {
-        latitude:  -1.2734374,
-        longitude: 36.7193039,
-    }
+    useEffect(() => {
+        getLocationHandler();
+        fetchProLocations();
+    }, [])
 
     const verifyPermissions = async () => {
         const result = await Permissions.askAsync(Permissions.LOCATION);
@@ -51,8 +52,8 @@ const MapScreen = props => {
             setCurrentLocationRegion({
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
-                latitudeDelta: 0.012522,
-                longitudeDelta: 0.0021
+                latitudeDelta: 0.256522,
+                longitudeDelta: 0.250021
             });
             dispatch(locationActions.setUserLocation({
                 lat: location.coords.latitude,
@@ -69,18 +70,37 @@ const MapScreen = props => {
         setIsFetchingLocation(false);
     }
 
-    useEffect(() => {
-        getLocationHandler();
-    }, [])
+    const fetchProLocations = async () => {
+        const dataSnapshot = await firebase.database().ref('pros_locations').once('value');
+        const results = dataSnapshot.val();
+        setProsLocations(results);
+    }
+
+    const regionChangedHandler = (region) => {
+        setCurrentLocationRegion(region);
+    }
 
     return (
         <Fragment>
             <MapView
-                style={{ flex: 1 }}
+                style={{ flex: 2 }}
                 region={currentLocationRegion}
                 showsUserLocation={true}
+                loadingEnabled
+                showsMyLocationButton
+                //onRegionChange={regionChangedHandler}
             >
-                {markerCoordinate && <Marker title="Picked Location" coordinate={markerCoordinate}></Marker>}
+                {
+                    prosLocations &&
+                    prosLocations.map((proLocation, index) => (
+                        <Marker title={proLocation.type} coordinate={proLocation} key={index /*will be proId later*/}>
+                            <Image
+                                source={require('../assets/pro-icon.png')}
+                                style={{ width: 35, height: 35 }}
+                            />
+                        </Marker>
+                    ))
+                }
             </MapView>
             <Card style={styles.card}>
                 <Text style={{ ...defaultStyles.bodyText, fontWeight: 'bold' }}> User ID is: {userId}</Text>
@@ -100,14 +120,12 @@ MapScreen.navigationOptions = {
 
 const styles = StyleSheet.create({
     card: {
-        width: '95%',
+        width: '100%',
         alignItems: 'center',
         justifyContent: 'space-between',
         alignSelf: 'center',
         padding: 20,
-        position: "absolute",
-        bottom: 5,
-        height: height / 3
+        flex: 1
     }
 })
 
