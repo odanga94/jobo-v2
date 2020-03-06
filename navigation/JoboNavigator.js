@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
 
 import ServicesScreen from '../screens/ServicesScreen';
-import DetailsScreen from '../screens/DetailsScreen';
+import ProblemDetailsScreen from '../screens/ProblemDetailsScreen';
 import CheckOutScreen from '../screens/CheckOutScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import OrdersScreen from '../screens/OrdersScreen';
@@ -31,7 +31,7 @@ const defaultStackNavOptions = {
 const HomeStackNavigator = createStackNavigator({
     Map: MapScreen,
     Services: ServicesScreen,
-    'Enter Details': DetailsScreen,
+    'Enter Details': ProblemDetailsScreen,
     'Check Out': CheckOutScreen,
 }, {
     defaultNavigationOptions: defaultStackNavOptions
