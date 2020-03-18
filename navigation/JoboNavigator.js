@@ -15,6 +15,7 @@ import MapScreen from '../screens/MapScreen';
 import OrderDetailsScreen from '../screens/OrderDetailsScreen';
 import AuthScreen from '../screens/AuthScreen';
 import StartUpScreen from '../screens/StartUpScreen';
+import PickLocationScreen from '../screens/PickLocationScreen'
 import Colors from '../constants/colors';
 
 const defaultStackNavOptions = {
@@ -32,6 +33,7 @@ const HomeStackNavigator = createStackNavigator({
     Map: MapScreen,
     Services: ServicesScreen,
     'Enter Details': ProblemDetailsScreen,
+    'Pick Location': PickLocationScreen,
     'Check Out': CheckOutScreen,
 }, {
     defaultNavigationOptions: defaultStackNavOptions

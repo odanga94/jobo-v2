@@ -2,6 +2,7 @@ import * as firebase from 'firebase';
 
 import Order from '../../models/order';
 import ENV from '../../env';
+import fetchAddress from '../../utility/fetchAddress';
 
 export const ADD_ORDER = 'ADD_ORDER';
 export const SET_ORDERS = 'SET_ORDERS';
@@ -41,15 +42,7 @@ export const fetchOrders = (userId) => {
 
 export const addOrder = (userId, problemName, service, totalAmount, proName, proImage, clientLocation) => {
     return async (dispatch) => {
-        const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${clientLocation.lat},${clientLocation.lng}&key=${ENV.googleApiKey}`);
-        if (!response.ok){
-            throw new Error('Something went wrong 😞');
-        }
-        const resData = await response.json();
-        if(!resData.results){
-            throw new Error('Something went wrong 😞');
-        }
-        const address = resData.results[0].formatted_address;
+        const address = await fetchAddress(clientLocation.lat, clientLocation.lng);
         const date = new Date().toString();
         let orderId;
         firebase.database().ref(`orders/${userId}`).push({

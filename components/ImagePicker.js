@@ -107,7 +107,7 @@ const ImagePicker = props => {
                     <Image
                         style={styles.image}
                         source={{ uri: props.imageUri }}
-                        resizeMode="contain"
+                        resizeMode="cover"
                     />
                 }
             </TouchableOpacity>
@@ -124,16 +124,20 @@ const styles = StyleSheet.create({
         height: width / 2,
         justifyContent: 'center',
         alignItems: 'center',
-        borderColor: '#ccc',
-        borderWidth: 1,
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
+        borderColor: '#ccc',
+        borderWidth: 1,
     },
     image: {
         width: '100%',
         height: '100%',
+        borderTopLeftRadius: 10,
+        borderTopRightRadius: 10,
+        borderBottomLeftRadius: 10,
+        borderBottomRightRadius: 10,
     }
 
 });
