@@ -11,22 +11,26 @@ import DefaultStyles from '../constants/default-styles';
 import fetchAddress from '../utility/fetchAddress';
 
 const ProblemDetailsScreen = props => {
-    const { navigation } =  props;
+    const { navigation } = props;
 
-    const pickedLocationAddress = navigation.getParam('pickedLocation');
-
-    const [clientAddress, setClientAddress] = useState('');
-
-    const clientLocation = useSelector(state => state.location.userLocation);
- 
     const proId = navigation.getParam('proId');
     const requiredDetails = PRO_DETAILS.find(detail => detail.proIds.indexOf(proId) >= 0);
+    const pickedLocationAddress = navigation.getParam('pickedLocation');
+    const selectedProblems = navigation.getParam('selectedItems');
+
+    const [problems, setProblems] = useState();
+    const [clientAddress, setClientAddress] = useState('');
+    const clientLocation = useSelector(state => state.location.userLocation);
+
 
     useEffect(() => {
-        if (pickedLocationAddress){
+        if (pickedLocationAddress) {
             setClientAddress(pickedLocationAddress);
         }
-    }, [pickedLocationAddress]);
+        if (selectedProblems) {
+            setProblems(selectedProblems);
+        }
+    }, [pickedLocationAddress, selectedProblems]);
 
     useEffect(() => {
         const getAddress = async () => {
@@ -48,8 +52,25 @@ const ProblemDetailsScreen = props => {
             { userAddress: clientAddress }
         );
     }
+
+    let renderProblemInfo = '';
+    if (problems) {
+        Object.keys(problems).forEach(key => {
+            renderProblemInfo = renderProblemInfo + problems[key].problemName + ',' + ' '
+        });
+    }
+
     return (
         <ScrollView contentContainerStyle={styles.screen}>
+            <Text style={DefaultStyles.bodyText}>What problem are you having ?</Text>
+            <ListButton
+                info={renderProblemInfo ? renderProblemInfo : "Select all that apply"}
+                pressedHandler={() => {
+                    navigation.navigate('ListItems', {
+                        items: ['Installation Work', 'Burst', 'Leak', 'Clog', 'Noisy', 'Unpleasant odor', 'Poor pressure', 'Poor temperature', 'Fixture not draining or flushing', 'Appliance not working', 'Others']
+                    })
+                }}
+            />
             <Plumbing />
             <Text style={DefaultStyles.bodyText}>Location:</Text>
             <ListButton info={clientAddress} pressedHandler={goToLocation} />
@@ -61,7 +82,7 @@ const ProblemDetailsScreen = props => {
             />
             <MainButton
                 onPress={() => {
-                    navigation.navigate({routeName: 'Check Out'})
+                    navigation.navigate({ routeName: 'Check Out' })
                 }}
             >Check Out</MainButton>
         </ScrollView>
@@ -80,7 +101,7 @@ ProblemDetailsScreen.navigationOptions = (navigationData) => {
 const styles = StyleSheet.create({
     screen: {
         width: '100%',
-        backgroundColor: 'white', 
+        backgroundColor: 'white',
         padding: 10
     }
 })
