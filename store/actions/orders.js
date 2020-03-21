@@ -1,8 +1,8 @@
 import * as firebase from 'firebase';
 
 import Order from '../../models/order';
+import { uploadImage } from '../../utility/functions';
 import ENV from '../../env';
-import fetchAddress from '../../utility/fetchAddress';
 
 export const ADD_ORDER = 'ADD_ORDER';
 export const SET_ORDERS = 'SET_ORDERS';
@@ -40,30 +40,29 @@ export const fetchOrders = (userId) => {
         }
 }
 
-export const addOrder = (userId, problemName, service, totalAmount, proName, proImage, clientLocation) => {
+export const addOrder = (userId, orderDetails, imageUri) => {
     return async (dispatch) => {
-        const address = await fetchAddress(clientLocation.lat, clientLocation.lng);
-        const date = new Date().toString();
         let orderId;
-        firebase.database().ref(`orders/${userId}`).push({
-            problemName,
-            service,
-            totalAmount,
-            date,
-            proName,
-            proImage,
-            clientAddress: address,
-            clientLocation
-        }).then(res => {
-            const resArray = res.toString().split('/');
-            orderId = resArray[resArray.length - 1];
-            console.log('[ORDER_ID]', orderId);
-        }).catch(err => {
-            console.log(err);
-            throw new Error('Something went wrong 😞');
-        })
+        try {
+            const orderRef = await firebase.database().ref(`orders/${userId}`).push(orderDetails);
+            const orderRefArray = orderRef.toString().split('/');
+            orderId = orderRefArray[orderRefArray.length - 1];
+            //console.log('[ORDER_ID]', orderId);
 
-        dispatch({
+        } catch(err){
+            throw new Error('Something went wrong 😞');
+        }
+        if(imageUri){
+            try {
+                const firebaseImageUri = await uploadImage(imageUri, `images/${userId}/orders/${orderId}/problemImage.jpg`);
+                await firebase.database().ref(`orders/${userId}/${orderId}`).update({ problemImage: firebaseImageUri });
+            } catch(err){
+                throw new Error('Error uploading image but your order was successful.');
+            }
+        }
+        
+
+        /*dispatch({
             type: ADD_ORDER,
             orderData: {
                 orderId,
@@ -76,6 +75,6 @@ export const addOrder = (userId, problemName, service, totalAmount, proName, pro
                 clientAddress: address,
                 clientLocation
             }
-        });
+        });*/
     }
 }

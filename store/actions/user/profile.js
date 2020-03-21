@@ -1,5 +1,7 @@
 import * as firebase from 'firebase';
 
+import { uploadImage } from '../../../utility/functions';
+
 export const FETCH_PROFILE = "FETCH_PROFILE";
 export const EDIT_PROFILE = "EDIT_PROFILE";
 export const UPDATE_IMAGE = "UPDATE_IMAGE";
@@ -22,20 +24,6 @@ export const fetchProfile = (uid) => {
 
 }
 
-const uploadImage = async (imageUri, uid) => {
-    try {
-        const response = await fetch(imageUri);
-        const blob = await response.blob();
-        const imageRef = firebase.storage().ref(`images/${uid}/profilePic.jpg`);
-        await imageRef.put(blob);
-        const downloadUrl = await imageRef.getDownloadURL();
-        return downloadUrl
-    } catch (err) {
-        console.log(err);
-        throw new Error(err);
-    }
-}
-
 export const editProfile = (uid, userData) => {
     return async dispatch => {
         try {
@@ -48,7 +36,7 @@ export const editProfile = (uid, userData) => {
                     });
                 });
             if (userData.imageUri){
-                const firebaseImageUri = await uploadImage(userData.imageUri, uid);
+                const firebaseImageUri = await uploadImage(userData.imageUri, `images/${uid}/profilePic.jpg`);
                 await userProfileRef.update({ profilePic: firebaseImageUri });
                 dispatch({
                     type: UPDATE_IMAGE,

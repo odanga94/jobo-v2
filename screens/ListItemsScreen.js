@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useCallback } from 'react';
+import React, { useReducer, useEffect, useCallback, useState } from 'react';
 import { Text, ScrollView } from 'react-native';
 import {
     ListItem,
@@ -29,15 +29,29 @@ const itemsReducer = (state, action) => {
 
 const ListItemsScreen = props => {
     const items = props.navigation.getParam('items');
+    const alreadySelectedItems = props.navigation.getParam("alreadySelected");
+    const type = props.navigation.getParam("type");
 
     let initialItemsState = {};
     items.forEach((item, index) => {
         initialItemsState[index] = {
-            problemName: item,
+            name: item,
             selected: false
         }
     });
     const [itemsState, dispatchItemsState] = useReducer(itemsReducer, initialItemsState);
+
+    useEffect(() => {
+        if(alreadySelectedItems && Object.keys(alreadySelectedItems).length !== 0){
+            Object.keys(alreadySelectedItems).forEach(key => {
+                dispatchItemsState({
+                    type: ITEMS_UPDATE,
+                    key,
+                    value: true
+                });
+            });    
+        }
+    }, [alreadySelectedItems]);
 
     const submitHandler = useCallback(() => {
         const selectedItems = {};
@@ -46,7 +60,7 @@ const ListItemsScreen = props => {
                 selectedItems[item] = { ...itemsState[item] }
             }
         }
-        props.navigation.navigate('Enter Details', { selectedItems })
+        props.navigation.navigate('Enter Details', { selectedItems, type })
     }, [itemsState]);
 
     useEffect(() => {

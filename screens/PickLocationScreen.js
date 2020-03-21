@@ -98,12 +98,15 @@ const PickLocationScreen = props => {
     }, [onSearchHandler]);
 
     const savePickedLocationHandler = useCallback(() => {
-        if (!selectedLocationAddress) {
+        if (!selectedLocationAddress || !selectedLocation) {
             //could show an alert
             return;
         }
-        navigation.navigate('Enter Details', { pickedLocation: selectedLocationAddress });
-    }, [selectedLocationAddress]);
+        navigation.navigate('Enter Details', {
+            pickedLocation: selectedLocation,
+            pickedLocationAddress: selectedLocationAddress 
+        });
+    }, [selectedLocationAddress, selectedLocation]);
 
     useEffect(() => {
         navigation.setParams({
