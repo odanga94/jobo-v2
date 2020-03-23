@@ -1,25 +1,32 @@
 import React, { useState, useEffect, Fragment } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    ScrollView,
+    TextInput,
+    Dimensions
+} from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
 import MainButton from '../components/UI/MainButton';
-import ProDetails from '../components/ProDetails';
-import Plumbing from '../components/ProblemDetails/Plumbing';
 import ListButton from '../components/UI/ListButton';
 import ImagePicker from '../components/ImagePicker';
+import Spinner from '../components/UI/Spinner';
 
 import DefaultStyles from '../constants/default-styles';
 import { fetchAddress } from '../utility/functions';
-import { PROS, PRO_DETAILS } from '../data/pros';
+import { PlumbingDetails, CleaningDetails } from '../data/problem-details';
 import * as orderActions from '../store/actions/orders';
-import Spinner from '../components/UI/Spinner';
+
+
+const { width } = Dimensions.get('window');
 
 const ProblemDetailsScreen = props => {
     const { navigation } = props;
     const userId = useSelector(state => state.auth.userId);
 
     const proId = navigation.getParam('proId');
-    const requiredDetails = PRO_DETAILS.find(detail => detail.proIds.indexOf(proId) >= 0);
     const pickedLocationAddress = navigation.getParam('pickedLocationAddress');
     const pickedLocation = navigation.getParam('pickedLocation');
     const selectedItems = navigation.getParam('selectedItems');
@@ -33,10 +40,24 @@ const ProblemDetailsScreen = props => {
     const [problemImage, setProblemImage] = useState();
     const [clientLocation, setClientLocation] = useState(useSelector(state => state.location.userLocation));
 
+    const [serviceDetails, setServiceDetails] = useState({});
     const [addOrderLoading, setAddOrderLoading] = useState(false);
     const [addOrderError, setAddOrderError] = useState();
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        switch (proId) {
+            case "p1":
+                setServiceDetails(PlumbingDetails);
+                return;
+            case "p2":
+                setServiceDetails(CleaningDetails);
+                return;
+            default:
+                return
+        }
+    }, [proId]);
 
     useEffect(() => {
         if (pickedLocationAddress) {
@@ -134,82 +155,111 @@ const ProblemDetailsScreen = props => {
         );
     }
 
+    if (Object.keys(serviceDetails).length === 0){
+        return null;
+    }
+
     return (
         <ScrollView contentContainerStyle={styles.screen}>
             <Fragment>
-                <Text style={DefaultStyles.bodyText}>What problem are you having ?</Text>
-                <ListButton
-                    info={renderProblemInfo ? renderProblemInfo : "Select all that apply"}
-                    pressedHandler={() => {
-                        navigation.navigate('ListItems', {
-                            items: ['Installation Work', 'Burst', 'Leak', 'Clog', 'Noisy', 'Unpleasant odor', 'Poor pressure', 'Poor temperature', 'Fixture not draining or flushing', 'Appliance not working', 'Others'],
-                            type: 'problems',
-                            alreadySelected: problems
-                        })
-                    }}
-                />
-                <Text style={DefaultStyles.bodyText}>What part of the plumbing system needs work ?</Text>
-                <ListButton
-                    info={renderPartsthatNeedsWork ? renderPartsthatNeedsWork : "Select all that apply"}
-                    pressedHandler={() => {
-                        navigation.navigate('ListItems', {
-                            items: ['Pipes and drains', 'Toilet', 'Sink', 'Shower or bathtub', 'Washing machine', 'Water heater', 'Septic tank', 'Well system', 'Others'],
-                            type: 'plumbingParts',
-                            alreadySelected: partsthatNeedWork
-                        })
-                    }}
-                />
-                <Text style={DefaultStyles.bodyText}>Which room requires plumbing work ?</Text>
-                <ListButton
-                    info={renderRoomsThatNeedWork ? renderRoomsThatNeedWork : "Select all that apply"}
-                    pressedHandler={() => {
-                        navigation.navigate('ListItems', {
-                            items: ['Bathroom', 'Kitchen', 'Laundry room', 'Outdoors', 'Toilet', 'Entire building', 'Others'],
-                            type: 'rooms',
-                            alreadySelected: roomsThatNeedWork
-                        })
-                    }}
-                />
-                <Text style={DefaultStyles.bodyText}>Anything else the pro should be aware of ?</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="optional"
-                    multiline={true}
-                    numberOfLines={5}
-                    onChangeText={setOptionalInfo}
-                    value={optionalInfo}
-                />
-                <Text style={DefaultStyles.bodyText}>Would you like to add a photo to better desribe your problem ?</Text>
-                <ImagePicker
-                    setImage={setProblemImage}
-                    imageUri={problemImage}
-                />
+                {
+                    serviceDetails.problemField &&
+                    <Fragment>
+                        <Text style={DefaultStyles.bodyText}>What problem are you having ?</Text>
+                        <ListButton
+                            info={renderProblemInfo ? renderProblemInfo : "Select all that apply"}
+                            pressedHandler={() => {
+                                navigation.navigate('ListItems', {
+                                    items: serviceDetails.problemField.items,
+                                    type: 'problems',
+                                    alreadySelected: problems
+                                })
+                            }}
+                        />
+                    </Fragment> 
+                }
+                {
+                    serviceDetails.partThatNeedsWorkField &&
+                    <Fragment>
+                        <Text style={DefaultStyles.bodyText}>{serviceDetails.partThatNeedsWorkField.fieldName}</Text>
+                        <ListButton
+                            info={renderPartsthatNeedsWork ? renderPartsthatNeedsWork : "Select all that apply"}
+                            pressedHandler={() => {
+                                navigation.navigate('ListItems', {
+                                    items: serviceDetails.partThatNeedsWorkField.items,
+                                    type: 'plumbingParts',
+                                    alreadySelected: partsthatNeedWork
+                                })
+                            }}
+                        />
+                    </Fragment>
+                }
+                {
+                    serviceDetails.roomThatNeedsWorkField &&
+                    <Fragment>
+                        <Text style={DefaultStyles.bodyText}>{serviceDetails.roomThatNeedsWorkField.fieldName}</Text>
+                        <ListButton
+                            info={renderRoomsThatNeedWork ? renderRoomsThatNeedWork : "Select all that apply"}
+                            pressedHandler={() => {
+                                navigation.navigate('ListItems', {
+                                    items: serviceDetails.roomThatNeedsWorkField.items,
+                                    type: 'rooms',
+                                    alreadySelected: roomsThatNeedWork
+                                })
+                            }}
+                        />
+                    </Fragment>
+                }
+                {
+                    serviceDetails.optionalInfoField &&
+                    <Fragment>
+                        <Text style={DefaultStyles.bodyText}>Anything else the pro should be aware of ?</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="optional"
+                            multiline={true}
+                            numberOfLines={5}
+                            onChangeText={setOptionalInfo}
+                            value={optionalInfo}
+                        />
+                    </Fragment>
+                }
+                {
+                    serviceDetails.needsPicture &&
+                    <Fragment>
+                        <Text style={DefaultStyles.bodyText}>Would you like to add a photo to better desribe your problem ?</Text>
+                        <ImagePicker
+                            setImage={setProblemImage}
+                            imageUri={problemImage}
+                        />
+                    </Fragment>
+                }
                 <Text style={DefaultStyles.bodyText}>Location:</Text>
                 <ListButton info={clientAddress} pressedHandler={goToLocation} />
-                {/* <ProDetails
-                            estimateDuration={requiredDetails.estimateDuration}
-                            needsTools={requiredDetails.needsTools}
-                            needsPicture={requiredDetails.needsPicture}
-                            needsDimensions={requiredDetails.needsDimensions}
-                            /> */}
-                <MainButton
-                    style={{ marginVertical: 10 }}
-                    onPress={() => {
-                        //navigation.navigate({ routeName: 'Check Out' });
-                        addOrder();
-                    }}
-                >Check Out</MainButton>
+                <View style={styles.buttonContainer}>
+                    <MainButton
+                        style={{ backgroundColor: "red", width: width / 2.3, height: 50 }}
+                        onPress={() => {
+                            navigation.navigate({ routeName: 'Map' });
+                        }}
+                    >Cancel</MainButton>
+                    <MainButton
+                        style={{ width: width / 2.3, height: 50 }}
+                        onPress={() => {
+                            //navigation.navigate({ routeName: 'Check Out' });
+                            addOrder();
+                        }}
+                    >Check Out</MainButton>
+                </View>
+
             </Fragment>
         </ScrollView>
     );
 };
 
 ProblemDetailsScreen.navigationOptions = (navigationData) => {
-    const proId = navigationData.navigation.getParam('proId');
-    const selectedPro = PROS.find(pro => pro.id === proId)
-
     return {
-        title: selectedPro.title
+        title: 'Enter Details'
     }
 }
 
@@ -238,6 +288,11 @@ const styles = StyleSheet.create({
         marginTop: 3,
         marginBottom: 7
     },
+    buttonContainer: {
+        marginVertical: 10,
+        flexDirection: "row",
+        justifyContent: "space-between"
+    }
 })
 
 export default ProblemDetailsScreen;

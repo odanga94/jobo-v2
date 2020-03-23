@@ -1,5 +1,4 @@
 import Pro from '../models/pro';
-import ProDetails from '../models/proDetails';
 
 export const PROS = [
     new Pro('p1', 'Plumber', require('../assets/pro-images/Plumber.png')),
@@ -16,27 +15,4 @@ export const PROS = [
     new Pro('p12', 'Pest Control', require('../assets/pro-images/Pest-Control.png'))
 ];
 
-export const PRO_DETAILS = [
-    new ProDetails(
-        ['p1', 'p2', 'p3', 'p6', 'p9', 'p11'],
-        1,
-        true,
-        true,
-        false
-    ),
-    new ProDetails(
-        ['p8'],
-        1,
-        true,
-        true,
-        true
-    ),
-    new ProDetails(
-        ['p4', 'p5', 'p10', 'p12', 'p7'],
-        1,
-        true,
-        false,
-        false
-    )
-]
 
