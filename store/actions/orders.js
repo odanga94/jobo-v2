@@ -50,6 +50,7 @@ export const addOrder = (userId, orderDetails, imageUri) => {
             //console.log('[ORDER_ID]', orderId);
 
         } catch(err){
+            console.log(err);
             throw new Error('Something went wrong 😞');
         }
         if(imageUri){

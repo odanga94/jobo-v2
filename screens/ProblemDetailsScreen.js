@@ -16,7 +16,20 @@ import Spinner from '../components/UI/Spinner';
 
 import DefaultStyles from '../constants/default-styles';
 import { fetchAddress } from '../utility/functions';
-import { PlumbingDetails, CleaningDetails } from '../data/problem-details';
+import { 
+    PlumbingDetails, 
+    CleaningDetails,
+    ElectricalDetails,
+    PaintingDetails,
+    BeautyDetails,
+    MovingDetails,
+    ITDetails,
+    PestControlDetails,
+    GardeningDetails,
+    CookingDetails,
+    TaxDetails,
+    CarpenterDetails
+} from '../data/problem-details';
 import * as orderActions from '../store/actions/orders';
 
 
@@ -35,6 +48,11 @@ const ProblemDetailsScreen = props => {
     const [problems, setProblems] = useState();
     const [partsthatNeedWork, setPartsthatNeedWork] = useState();
     const [roomsThatNeedWork, setRoomsThatNeedWork] = useState();
+    const [buildingType, setBuildingType] = useState();
+    const [equipmentNeeded, setEquipmentNeeded] = useState();
+    const [bucketsOfClothes, setBucketsOfClothes] = useState();
+    const [mealDescription, setMealDescription] = useState();
+    const [numberOfPeople, setNumberOfPeople] = useState();
     const [clientAddress, setClientAddress] = useState('');
     const [optionalInfo, setOptionalInfo] = useState('');
     const [problemImage, setProblemImage] = useState();
@@ -54,8 +72,38 @@ const ProblemDetailsScreen = props => {
             case "p2":
                 setServiceDetails(CleaningDetails);
                 return;
+            case "p3":
+                setServiceDetails(ElectricalDetails);
+                return;
+            case "p8":
+                setServiceDetails(PaintingDetails);
+                return;
+            case "p4":
+                setServiceDetails(BeautyDetails);
+                return;
+            case "p5":
+                setServiceDetails(MovingDetails);
+                return;
+            case "p11":
+                setServiceDetails(ITDetails);
+                return;
+            case "p12":
+                setServiceDetails(PestControlDetails);
+                return;
+            case "p6":
+                setServiceDetails(GardeningDetails);
+                return;
+            case "p7":
+                setServiceDetails(CookingDetails);
+                return;
+            case "p10":
+                setServiceDetails(TaxDetails);
+                return;
+            case "p9":
+                setServiceDetails(CarpenterDetails);
+                return;
             default:
-                return
+                return;
         }
     }, [proId]);
 
@@ -70,6 +118,14 @@ const ProblemDetailsScreen = props => {
             setPartsthatNeedWork(selectedItems);
         } else if (selectedItems && type === 'rooms') {
             setRoomsThatNeedWork(selectedItems);
+        } else if (selectedItems && type === 'buildingType') {
+            setBuildingType(selectedItems);
+        } else if (selectedItems && type === 'equipmentNeeded') {
+            setEquipmentNeeded(selectedItems);
+        } else if(selectedItems && type === 'bucketsOfClothes'){
+            setBucketsOfClothes(selectedItems);
+        } else if(selectedItems && type === 'numberOfPeople'){
+            setNumberOfPeople(selectedItems);
         }
     }, [pickedLocationAddress, selectedItems, type]);
 
@@ -85,7 +141,7 @@ const ProblemDetailsScreen = props => {
         if (clientLocation) {
             getAddress();
         }
-    }, [clientLocation]);
+    }, []);
 
     const goToLocation = () => {
         navigation.navigate(
@@ -95,48 +151,72 @@ const ProblemDetailsScreen = props => {
     }
 
     const addOrder = async () => {
+        const getString = (stateName) => {
+            return Object.keys(stateName).map(key => stateName[key].name).join(", ");
+        }
         setAddOrderError(null);
         setAddOrderLoading(true);
         try {
             const orderDetails = {
-                problemType: "plumbing",
-                problemNames: [...Object.keys(problems).map(key => problems[key].name)],
-                partsThatNeedWork: [...Object.keys(partsthatNeedWork).map(key => partsthatNeedWork[key].name)],
-                roomsThatNeedWork: [...Object.keys(roomsThatNeedWork).map(key => roomsThatNeedWork[key].name)],
+                problemType: serviceDetails.problemName,
+                problemNames: problems ? getString(problems) : null,
+                partsThatNeedWork: partsthatNeedWork ? getString(partsthatNeedWork) : null,
+                roomsThatNeedWork: roomsThatNeedWork ? getString(roomsThatNeedWork) : null,
+                buildingType: buildingType ? getString(buildingType) : null,
+                equipmentNeeded: equipmentNeeded ? getString(equipmentNeeded) : null,
+                bucketsOfClothes: bucketsOfClothes ? getString(bucketsOfClothes) : null,
+                mealDescription: mealDescription ? mealDescription : null,
+                numberOfPeople: numberOfPeople ? getString(numberOfPeople) : null,
                 optionalInfo,
                 clientAddress,
                 clientLocation,
-                dateRequested: new Date().toString(),
+                dateRequested: new Date().toISOString(),
                 status: "pending"
             }
             await dispatch(orderActions.addOrder(userId, orderDetails, problemImage));
             setAddOrderLoading(false);
+            navigation.navigate('Map');
         } catch (err) {
             setAddOrderError(err.message);
             setAddOrderLoading(false);
         }
     }
 
+    const renderField = (fieldName, stateName) => {
+        Object.keys(stateName).forEach(key => {
+            fieldName = fieldName + stateName[key].name + ',' + '  ';
+        });
+        fieldName = fieldName.slice(fieldName).slice(0, fieldName.length - 3);
+        return fieldName;
+    }
+
     let renderProblemInfo = '';
     if (problems) {
-        Object.keys(problems).forEach(key => {
-            renderProblemInfo = renderProblemInfo + problems[key].name + ',' + '  ';
-        });
-        renderProblemInfo = renderProblemInfo.slice(renderProblemInfo).slice(0, renderProblemInfo.length - 3);
+        renderProblemInfo = renderField(renderProblemInfo, problems);
     }
     let renderPartsthatNeedsWork = '';
     if (partsthatNeedWork) {
-        Object.keys(partsthatNeedWork).forEach(key => {
-            renderPartsthatNeedsWork = renderPartsthatNeedsWork + partsthatNeedWork[key].name + ',' + '  ';
-        })
-        renderPartsthatNeedsWork = renderPartsthatNeedsWork.slice(0, renderPartsthatNeedsWork.length - 3);
+        renderPartsthatNeedsWork = renderField(renderPartsthatNeedsWork, partsthatNeedWork);
     }
     let renderRoomsThatNeedWork = '';
     if (roomsThatNeedWork) {
-        Object.keys(roomsThatNeedWork).forEach(key => {
-            renderRoomsThatNeedWork = renderRoomsThatNeedWork + roomsThatNeedWork[key].name + ',' + '  ';
-        })
-        renderRoomsThatNeedWork = renderRoomsThatNeedWork.slice(0, renderRoomsThatNeedWork.length - 3);
+        renderRoomsThatNeedWork = renderField(renderRoomsThatNeedWork, roomsThatNeedWork);
+    }
+    let renderBuildingType = '';
+    if (buildingType){
+        renderBuildingType = renderField(renderBuildingType, buildingType);
+    }
+    let renderEquipmentNeeded = '';
+    if (equipmentNeeded){
+       renderEquipmentNeeded = renderField(renderEquipmentNeeded, equipmentNeeded);
+    }
+    let renderBucketsOfClothes = '';
+    if (bucketsOfClothes){
+        renderBucketsOfClothes = renderField(renderBucketsOfClothes, bucketsOfClothes);
+    }
+    let renderNoOfPeople = '';
+    if (numberOfPeople){
+        renderNoOfPeople = renderField(renderNoOfPeople, numberOfPeople);
     }
 
     if (addOrderLoading) {
@@ -158,14 +238,14 @@ const ProblemDetailsScreen = props => {
     if (Object.keys(serviceDetails).length === 0){
         return null;
     }
-
+   
     return (
         <ScrollView contentContainerStyle={styles.screen}>
             <Fragment>
                 {
                     serviceDetails.problemField &&
                     <Fragment>
-                        <Text style={DefaultStyles.bodyText}>What problem are you having ?</Text>
+                        <Text style={DefaultStyles.bodyText}>{serviceDetails.problemField.fieldName}</Text>
                         <ListButton
                             info={renderProblemInfo ? renderProblemInfo : "Select all that apply"}
                             pressedHandler={() => {
@@ -195,16 +275,99 @@ const ProblemDetailsScreen = props => {
                     </Fragment>
                 }
                 {
+                    serviceDetails.buildingType &&
+                    <Fragment>
+                        <Text style={DefaultStyles.bodyText}>{serviceDetails.buildingType.fieldName}</Text>
+                        <ListButton
+                            info={renderBuildingType ? renderBuildingType : !serviceDetails.buildingType.manySelectable ? "Select all that apply" : "Select one" }
+                            pressedHandler={() => {
+                                navigation.navigate('ListItems', {
+                                    items: serviceDetails.buildingType.items,
+                                    type: 'buildingType',
+                                    alreadySelected: buildingType,
+                                    manySelectable: serviceDetails.buildingType.manySelectable
+                                })
+                            }}
+                        />
+                    </Fragment>
+                }
+                {
                     serviceDetails.roomThatNeedsWorkField &&
                     <Fragment>
                         <Text style={DefaultStyles.bodyText}>{serviceDetails.roomThatNeedsWorkField.fieldName}</Text>
                         <ListButton
-                            info={renderRoomsThatNeedWork ? renderRoomsThatNeedWork : "Select all that apply"}
+                            info={renderRoomsThatNeedWork ? renderRoomsThatNeedWork : !serviceDetails.roomThatNeedsWorkField.manySelectable ? "Select all that apply" : "Select one" }
                             pressedHandler={() => {
                                 navigation.navigate('ListItems', {
                                     items: serviceDetails.roomThatNeedsWorkField.items,
                                     type: 'rooms',
-                                    alreadySelected: roomsThatNeedWork
+                                    alreadySelected: roomsThatNeedWork,
+                                    manySelectable: serviceDetails.roomThatNeedsWorkField.manySelectable
+                                })
+                            }}
+                        />
+                    </Fragment>
+                }
+                {
+                    serviceDetails.bucketsOfClothes &&
+                    <Fragment>
+                        <Text style={DefaultStyles.bodyText}>{serviceDetails.bucketsOfClothes.fieldName}</Text>
+                        <ListButton
+                            info={renderBucketsOfClothes ? renderBucketsOfClothes : !serviceDetails.bucketsOfClothes.manySelectable ? "Select all that apply" : "Select one" }
+                            pressedHandler={() => {
+                                navigation.navigate('ListItems', {
+                                    items: serviceDetails.bucketsOfClothes.items,
+                                    type: 'bucketsOfClothes',
+                                    alreadySelected: bucketsOfClothes,
+                                    manySelectable: serviceDetails.bucketsOfClothes.manySelectable
+                                })
+                            }}
+                        />
+                    </Fragment>
+                }
+                {
+                    serviceDetails.mealDescription &&
+                    <Fragment>
+                        <Text style={DefaultStyles.bodyText}>Describe the meal you would like cooked</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="name of meal, how you want it cooked etc."
+                            multiline={true}
+                            numberOfLines={5}
+                            onChangeText={setMealDescription}
+                            value={mealDescription}
+                        />
+                    </Fragment>
+                }
+                {
+                    serviceDetails.equipmentNeeded &&
+                    <Fragment>
+                        <Text style={DefaultStyles.bodyText}>{serviceDetails.equipmentNeeded.fieldName}</Text>
+                        <ListButton
+                            info={renderEquipmentNeeded ? renderEquipmentNeeded : !serviceDetails.equipmentNeeded.manySelectable ? "Select all that apply" : "Select one" }
+                            pressedHandler={() => {
+                                navigation.navigate('ListItems', {
+                                    items: serviceDetails.equipmentNeeded.items,
+                                    type: 'equipmentNeeded',
+                                    alreadySelected: equipmentNeeded,
+                                    manySelectable: serviceDetails.equipmentNeeded.manySelectable
+                                })
+                            }}
+                        />
+                    </Fragment>
+                }
+                {
+                    serviceDetails.numberOfPeople &&
+                    <Fragment>
+                        <Text style={DefaultStyles.bodyText}>{serviceDetails.numberOfPeople.fieldName}</Text>
+                        <ListButton
+                            info={renderNoOfPeople ? renderNoOfPeople : !serviceDetails.numberOfPeople.manySelectable ? "Select all that apply" : "Select one" }
+                            pressedHandler={() => {
+                                navigation.navigate('ListItems', {
+                                    items: serviceDetails.numberOfPeople.items,
+                                    type: 'numberOfPeople',
+                                    alreadySelected: numberOfPeople,
+                                    manySelectable: serviceDetails.numberOfPeople.manySelectable
                                 })
                             }}
                         />
@@ -259,7 +422,8 @@ const ProblemDetailsScreen = props => {
 
 ProblemDetailsScreen.navigationOptions = (navigationData) => {
     return {
-        title: 'Enter Details'
+        title: 'Enter Details',
+        headerBackTitle: 'All Services' 
     }
 }
 
@@ -286,7 +450,7 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         fontFamily: 'poppins-regular',
         marginTop: 3,
-        marginBottom: 7
+        marginBottom: 15
     },
     buttonContainer: {
         marginVertical: 10,

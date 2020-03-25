@@ -13,6 +13,8 @@ import Colors from '../constants/colors';
 import { IoniconHeaderButton } from '../components/UI/HeaderButton';
 
 const ITEMS_UPDATE = 'ITEMS_UPDATE'
+const ITEMS_UPDATE_ONE_SELECTABLE = 'ITEMS_UPDATE_ONE_SELECTABLE';
+
 const itemsReducer = (state, action) => {
     if (action.type === ITEMS_UPDATE) {
         const updatedItem = {
@@ -23,6 +25,23 @@ const itemsReducer = (state, action) => {
             ...state,
             [action.key]: updatedItem
         }
+    } else if (action.type === ITEMS_UPDATE_ONE_SELECTABLE) {
+        const updatedState = {};
+        for(let key in state){
+            if(key == action.key){
+                updatedState[key] = {
+                    ...state[key],
+                    selected: action.value
+                }
+                //console.log('updated');
+            } else {
+                updatedState[key] = {
+                    ...state[key],
+                    selected: false
+                }
+            } 
+        }
+        return updatedState;
     }
     return state;
 }
@@ -31,6 +50,7 @@ const ListItemsScreen = props => {
     const items = props.navigation.getParam('items');
     const alreadySelectedItems = props.navigation.getParam("alreadySelected");
     const type = props.navigation.getParam("type");
+    const manySelectable = props.navigation.getParam('manySelectable');
 
     let initialItemsState = {};
     items.forEach((item, index) => {
@@ -67,6 +87,8 @@ const ListItemsScreen = props => {
         props.navigation.setParams({ 'submit': submitHandler })
     }, [submitHandler]);
 
+    //console.log(itemsState, manySelectable);
+
     return (
         <ScrollView>
             {
@@ -74,6 +96,14 @@ const ListItemsScreen = props => {
                     <ListItem
                         key={index}
                         onPress={() => {
+                            if(manySelectable === "no"){
+                                dispatchItemsState({
+                                    type: ITEMS_UPDATE_ONE_SELECTABLE,
+                                    key: index,
+                                    value: !itemsState[index].selected
+                                });
+                                return;
+                            }
                             dispatchItemsState({
                                 type: ITEMS_UPDATE,
                                 key: index,
