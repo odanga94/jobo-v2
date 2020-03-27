@@ -3,35 +3,17 @@ import moment from 'moment';
 class Order {
     constructor(
         id,
-        problemName,
-        service,
-        totalAmount,
-        date,
-        proName,
-        proImage,
-        clientAddress,
-        clientLocation
+        orderDetails
     ) {
         this.id = id;
-        this.problemName = problemName;
-        this.service = service;
-        this.proImage = proImage;
-        this.totalAmount = totalAmount;
-        this.date = date;
-        this.proName = proName;
-        this.clientAddress = clientAddress;
-        this.clientLocation = clientLocation
+        this.proImage = "https://firebasestorage.googleapis.com/v0/b/jobo-3a84b.appspot.com/o/proPic.jpg?alt=media&token=63fe6e15-9529-432b-b6e5-74d792b5211d";
+        this.proName = "John Odanga";
+        this.totalAmount = 200;
+        this.orderDetails = orderDetails
     }
 
     get readableDate() {
-        /*return this.date.toLocaleDateString('en-EN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });*/
-        return moment(this.date).format('MMMM Do YYYY, h:mm a')
+        return moment(this.orderDetails.dateRequested).format('MMMM Do YYYY, h:mm a')
     }
 }
 

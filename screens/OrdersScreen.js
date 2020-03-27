@@ -80,9 +80,11 @@ const OrdersScreen = props => {
             renderItem={itemData => (
                 <OrderItem
                     image={itemData.item.proImage}
-                    problem={itemData.item.problemName}
+                    problem={itemData.item.orderDetails.problemType}
+                    status={itemData.item.orderDetails.status}
                     price={itemData.item.totalAmount}
                     date={itemData.item.readableDate}
+                    proName={itemData.item.proName}
                     onViewDetail={() => {
                         props.navigation.navigate({
                             routeName: 'OrderDetails',

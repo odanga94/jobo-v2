@@ -17,17 +17,10 @@ export const fetchOrders = (userId) => {
             const loadedOrders = resData ? Object.keys(resData).map(key => {
                 return new Order(
                     key,
-                    resData[key].problemName,
-                    resData[key].service,
-                    resData[key].totalAmount,
-                    new Date(resData[key].date),
-                    resData[key].proName,
-                    resData[key].proImage,
-                    resData[key].clientAddress,
-                    resData[key].clientLocation
+                    { ...resData[key] }
                 );
             }) : [];
-            loadedOrders.sort((a, b) => a.date > b.date ? -1 : 1)
+            loadedOrders.sort((a, b) => a.orderDetails.dateRequested > b.orderDetails.dateRequested ? -1 : 1)
             //console.log(loadedOrders);*/
             dispatch({
                 type: SET_ORDERS,
@@ -63,19 +56,9 @@ export const addOrder = (userId, orderDetails, imageUri) => {
         }
         
 
-        /*dispatch({
+        dispatch({
             type: ADD_ORDER,
-            orderData: {
-                orderId,
-                problemName,
-                service,
-                totalAmount,
-                date,
-                proName,
-                proImage,
-                clientAddress: address,
-                clientLocation
-            }
-        });*/
+            orderDetails
+        });
     }
 }

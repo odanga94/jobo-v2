@@ -12,15 +12,8 @@ export default (state = initialState, action) => {
                 ...state,
                 orders: state.orders.concat(
                     new Order(
-                        action.orderData.orderId,
-                        action.orderData.problemName,
-                        action.orderData.service,
-                        action.orderData.totalAmount,
-                        action.orderData.date,
-                        action.orderData.proName,
-                        action.orderData.proImage,
-                        action.orderData.clientAddress,
-                        action.orderData.clientLocation
+                        action.orderId,
+                        action.orderDetails
                     ),
                 )
             }

@@ -13,26 +13,35 @@ import {
 
 import Colors from '../constants/colors';
 import MainButton from './UI/MainButton';
+import DefaultStyles from '../constants/default-styles'
 
 const { height } = Dimensions.get('window');
 
 const OrderItem = props => {
+    const formatToSentenceCase = text => text.split("")[0].toUpperCase() + text.slice(1);
+
     const TouchableCmp = Platform.OS === 'android' && Platform.Version >= 21 ? TouchableNativeFeedback : TouchableOpacity;
     return (
         <TouchableCmp onPress={props.onViewDetail} useForeground>
             <View style={styles.order}>
-                <View style={styles.imageContainer}>
-                    <Image source={{uri: props.image}} style={styles.image} /*resizeMode='contain'*/ />
-                </View>
-                <View style={{height: '20%', marginBottom: 10}}>
-                    <Text style={styles.date}>{props.date}</Text>
-                    <View style={styles.details}>
-                        <Text style={styles.title}>{props.problem}</Text>
-                        <Text style={styles.price}>KES.{props.price.toFixed(2)}</Text>
+                <View style={styles.proInfoContainer}>
+                    <View style={styles.imageContainer}>
+                        <Image source={{ uri: props.image }} style={styles.image} /*resizeMode='contain'*/ />
+                    </View>
+                    <View>
+                        <Text style={{ ...styles.title, color: "#505050" }}>{props.proName}</Text>
+                        <Text style={styles.date}>{props.date}</Text>
                     </View>
                 </View>
+                <View style={{ height: '20%', marginBottom: 10 }}>
+                    <View style={styles.details}>
+                        <Text style={styles.title}>{formatToSentenceCase(props.problem)}</Text>
+                        <Text style={styles.price}>KES.{props.price.toFixed(2)}</Text>
+                    </View>
+                    <Text style={DefaultStyles.bodyText}>status:  <Text style={{color: Colors.secondary}}>{formatToSentenceCase(props.status)}</Text></Text>
+                </View>
                 <View style={styles.actions} >
-                    <MainButton onPress={props.onViewDetail} style={{paddingHorizontal: 12.5, paddingVertical: 5}}>
+                    <MainButton onPress={props.onViewDetail} style={{ paddingHorizontal: 12.5, paddingVertical: 5 }}>
                         View Details
                     </MainButton>
                 </View>
@@ -53,6 +62,8 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         height: height / 3.5,
         margin: 15,
+        paddingHorizontal: 10,
+        justifyContent: "space-around"
     },
     image: {
         width: '100%',
@@ -76,20 +87,23 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 10,
+    
     },
     imageContainer: {
-        width: height / 7,
-        height: height / 7,
+        width: height / 8,
+        height: height / 8,
         borderRadius: 150,
         borderWidth: 3,
         borderColor: Colors.secondary,
         overflow: "hidden",
-        alignSelf: 'center',
-        marginVertical: 3
+        marginVertical: 3,
+        marginRight: 10
+    },
+    proInfoContainer: {
+        flexDirection: "row",
+        alignItems: "center"
     },
     date: {
-        marginLeft: 10,
         fontSize: 16,
         fontFamily: 'poppins-regular',
         color: '#888'
