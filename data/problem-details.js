@@ -71,7 +71,7 @@ export const MovingDetails = new ProblemDetails(
 );
 
 export const ITDetails = new ProblemDetails(
-    "IT issue",
+    "IT",
     { fieldName: "What IT issue are you having ?", items: ["OS installation", "Mobile phone repair", "Computer crashed", "Software installation", "Others"] },
     { fieldName: "Your operating system is", items: ["Windows", "Mac OS", "Linux", "Android", "iOS"] },
     undefined,

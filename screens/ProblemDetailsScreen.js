@@ -16,8 +16,8 @@ import Spinner from '../components/UI/Spinner';
 
 import DefaultStyles from '../constants/default-styles';
 import { fetchAddress } from '../utility/functions';
-import { 
-    PlumbingDetails, 
+import {
+    PlumbingDetails,
     CleaningDetails,
     ElectricalDetails,
     PaintingDetails,
@@ -122,9 +122,9 @@ const ProblemDetailsScreen = props => {
             setBuildingType(selectedItems);
         } else if (selectedItems && type === 'equipmentNeeded') {
             setEquipmentNeeded(selectedItems);
-        } else if(selectedItems && type === 'bucketsOfClothes'){
+        } else if (selectedItems && type === 'bucketsOfClothes') {
             setBucketsOfClothes(selectedItems);
-        } else if(selectedItems && type === 'numberOfPeople'){
+        } else if (selectedItems && type === 'numberOfPeople') {
             setNumberOfPeople(selectedItems);
         }
     }, [pickedLocationAddress, selectedItems, type]);
@@ -150,36 +150,30 @@ const ProblemDetailsScreen = props => {
         );
     }
 
-    const addOrder = async () => {
+    const goToCheckOut = async () => {
         const getString = (stateName) => {
             return Object.keys(stateName).map(key => stateName[key].name).join(", ");
         }
-        setAddOrderError(null);
-        setAddOrderLoading(true);
-        try {
-            const orderDetails = {
-                problemType: serviceDetails.problemName,
-                problemNames: problems ? getString(problems) : null,
-                partsThatNeedWork: partsthatNeedWork ? getString(partsthatNeedWork) : null,
-                roomsThatNeedWork: roomsThatNeedWork ? getString(roomsThatNeedWork) : null,
-                buildingType: buildingType ? getString(buildingType) : null,
-                equipmentNeeded: equipmentNeeded ? getString(equipmentNeeded) : null,
-                bucketsOfClothes: bucketsOfClothes ? getString(bucketsOfClothes) : null,
-                mealDescription: mealDescription ? mealDescription : null,
-                numberOfPeople: numberOfPeople ? getString(numberOfPeople) : null,
-                optionalInfo,
-                clientAddress,
-                clientLocation,
-                dateRequested: new Date().toISOString(),
-                status: "pending"
-            }
-            await dispatch(orderActions.addOrder(userId, orderDetails, problemImage));
-            setAddOrderLoading(false);
-            navigation.navigate('Map');
-        } catch (err) {
-            setAddOrderError(err.message);
-            setAddOrderLoading(false);
+        const orderDetails = {
+            problemType: serviceDetails.problemName,
+            problemNames: problems ? getString(problems) : null,
+            partsThatNeedWork: partsthatNeedWork ? getString(partsthatNeedWork) : null,
+            roomsThatNeedWork: roomsThatNeedWork ? getString(roomsThatNeedWork) : null,
+            buildingType: buildingType ? getString(buildingType) : null,
+            equipmentNeeded: equipmentNeeded ? getString(equipmentNeeded) : null,
+            bucketsOfClothes: bucketsOfClothes ? getString(bucketsOfClothes) : null,
+            mealDescription: mealDescription ? mealDescription : null,
+            numberOfPeople: numberOfPeople ? getString(numberOfPeople) : null,
+            optionalInfo,
+            clientAddress,
+            clientLocation,
+            dateRequested: new Date().toISOString(),
+            status: "pending"
         }
+        navigation.navigate('Check Out', {
+            orderDetails,
+            problemImage
+        });
     }
 
     const renderField = (fieldName, stateName) => {
@@ -203,19 +197,19 @@ const ProblemDetailsScreen = props => {
         renderRoomsThatNeedWork = renderField(renderRoomsThatNeedWork, roomsThatNeedWork);
     }
     let renderBuildingType = '';
-    if (buildingType){
+    if (buildingType) {
         renderBuildingType = renderField(renderBuildingType, buildingType);
     }
     let renderEquipmentNeeded = '';
-    if (equipmentNeeded){
-       renderEquipmentNeeded = renderField(renderEquipmentNeeded, equipmentNeeded);
+    if (equipmentNeeded) {
+        renderEquipmentNeeded = renderField(renderEquipmentNeeded, equipmentNeeded);
     }
     let renderBucketsOfClothes = '';
-    if (bucketsOfClothes){
+    if (bucketsOfClothes) {
         renderBucketsOfClothes = renderField(renderBucketsOfClothes, bucketsOfClothes);
     }
     let renderNoOfPeople = '';
-    if (numberOfPeople){
+    if (numberOfPeople) {
         renderNoOfPeople = renderField(renderNoOfPeople, numberOfPeople);
     }
 
@@ -235,10 +229,10 @@ const ProblemDetailsScreen = props => {
         );
     }
 
-    if (Object.keys(serviceDetails).length === 0){
+    if (Object.keys(serviceDetails).length === 0) {
         return null;
     }
-   
+
     return (
         <ScrollView contentContainerStyle={styles.screen}>
             <Fragment>
@@ -256,7 +250,7 @@ const ProblemDetailsScreen = props => {
                                 })
                             }}
                         />
-                    </Fragment> 
+                    </Fragment>
                 }
                 {
                     serviceDetails.partThatNeedsWorkField &&
@@ -279,7 +273,7 @@ const ProblemDetailsScreen = props => {
                     <Fragment>
                         <Text style={DefaultStyles.bodyText}>{serviceDetails.buildingType.fieldName}</Text>
                         <ListButton
-                            info={renderBuildingType ? renderBuildingType : !serviceDetails.buildingType.manySelectable ? "Select all that apply" : "Select one" }
+                            info={renderBuildingType ? renderBuildingType : !serviceDetails.buildingType.manySelectable ? "Select all that apply" : "Select one"}
                             pressedHandler={() => {
                                 navigation.navigate('ListItems', {
                                     items: serviceDetails.buildingType.items,
@@ -296,7 +290,7 @@ const ProblemDetailsScreen = props => {
                     <Fragment>
                         <Text style={DefaultStyles.bodyText}>{serviceDetails.roomThatNeedsWorkField.fieldName}</Text>
                         <ListButton
-                            info={renderRoomsThatNeedWork ? renderRoomsThatNeedWork : !serviceDetails.roomThatNeedsWorkField.manySelectable ? "Select all that apply" : "Select one" }
+                            info={renderRoomsThatNeedWork ? renderRoomsThatNeedWork : !serviceDetails.roomThatNeedsWorkField.manySelectable ? "Select all that apply" : "Select one"}
                             pressedHandler={() => {
                                 navigation.navigate('ListItems', {
                                     items: serviceDetails.roomThatNeedsWorkField.items,
@@ -313,7 +307,7 @@ const ProblemDetailsScreen = props => {
                     <Fragment>
                         <Text style={DefaultStyles.bodyText}>{serviceDetails.bucketsOfClothes.fieldName}</Text>
                         <ListButton
-                            info={renderBucketsOfClothes ? renderBucketsOfClothes : !serviceDetails.bucketsOfClothes.manySelectable ? "Select all that apply" : "Select one" }
+                            info={renderBucketsOfClothes ? renderBucketsOfClothes : !serviceDetails.bucketsOfClothes.manySelectable ? "Select all that apply" : "Select one"}
                             pressedHandler={() => {
                                 navigation.navigate('ListItems', {
                                     items: serviceDetails.bucketsOfClothes.items,
@@ -344,7 +338,7 @@ const ProblemDetailsScreen = props => {
                     <Fragment>
                         <Text style={DefaultStyles.bodyText}>{serviceDetails.equipmentNeeded.fieldName}</Text>
                         <ListButton
-                            info={renderEquipmentNeeded ? renderEquipmentNeeded : !serviceDetails.equipmentNeeded.manySelectable ? "Select all that apply" : "Select one" }
+                            info={renderEquipmentNeeded ? renderEquipmentNeeded : !serviceDetails.equipmentNeeded.manySelectable ? "Select all that apply" : "Select one"}
                             pressedHandler={() => {
                                 navigation.navigate('ListItems', {
                                     items: serviceDetails.equipmentNeeded.items,
@@ -361,7 +355,7 @@ const ProblemDetailsScreen = props => {
                     <Fragment>
                         <Text style={DefaultStyles.bodyText}>{serviceDetails.numberOfPeople.fieldName}</Text>
                         <ListButton
-                            info={renderNoOfPeople ? renderNoOfPeople : !serviceDetails.numberOfPeople.manySelectable ? "Select all that apply" : "Select one" }
+                            info={renderNoOfPeople ? renderNoOfPeople : !serviceDetails.numberOfPeople.manySelectable ? "Select all that apply" : "Select one"}
                             pressedHandler={() => {
                                 navigation.navigate('ListItems', {
                                     items: serviceDetails.numberOfPeople.items,
@@ -409,8 +403,7 @@ const ProblemDetailsScreen = props => {
                     <MainButton
                         style={{ width: width / 2.3, height: 50 }}
                         onPress={() => {
-                            //navigation.navigate({ routeName: 'Check Out' });
-                            addOrder();
+                            goToCheckOut();
                         }}
                     >Check Out</MainButton>
                 </View>
@@ -423,7 +416,7 @@ const ProblemDetailsScreen = props => {
 ProblemDetailsScreen.navigationOptions = (navigationData) => {
     return {
         title: 'Enter Details',
-        headerBackTitle: 'All Services' 
+        headerBackTitle: 'All Services'
     }
 }
 

@@ -28,26 +28,6 @@ const OrdersScreen = props => {
         setIsLoading(false);
     }, [dispatch, setIsLoading, setError, userId]);
 
-    /*useEffect(() => {
-        /*dispatch(orderActions.addOrder(
-            userId,
-            'Broken Sink',
-            'Plumber',
-            1000,
-            'John Odanga',
-            'https://firebasestorage.googleapis.com/v0/b/jobo-3a84b.appspot.com/o/proPic.jpg?alt=media&token=63fe6e15-9529-432b-b6e5-74d792b5211d',
-            userLocation
-        ));
-        /* dispatch(orderActions.addOrder(
-            userId,
-            'Laundry',
-            'Cleaner',
-             300,
-             'Olivia',
-            'https://firebasestorage.googleapis.com/v0/b/jobo-3a84b.appspot.com/o/proPic.jpg?alt=media&token=63fe6e15-9529-432b-b6e5-74d792b5211d',
-            userLocation,
-        )); 
-    }, [userId, userLocation, dispatch]);*/
 
     useEffect(() => {
         loadOrders();
