@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import {
     KeyboardAvoidingView,
     ScrollView,
@@ -12,6 +12,9 @@ import {
     Platform,
     Alert,
 } from 'react-native';
+import * as facebook from 'expo-facebook';
+import * as firebase from 'firebase';
+import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 
 import MainButton from '../components/UI/MainButton';
@@ -23,10 +26,11 @@ import SignInWithEmailForm from '../components/SignInWithEmailForm';
 import SignUpWithEmailForm from '../components/SignUpWithEmailForm';
 
 
-const { height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const AuthScreen = props => {
     const [isSignUp, setIsSignUp] = useState(false);
+    const [isEmailAuth, setIsEmailAuth] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [formIsValid, setFormIsValid] = useState(false);
     const [credentials, setCredentials] = useState();
@@ -59,6 +63,34 @@ const AuthScreen = props => {
         }
     }
 
+    const signInWithFacebook = async () => {
+        try {
+            const {
+                type,
+                token,
+                expires,
+                permissions,
+                declinedPermissions,
+            } = await facebook.logInWithReadPermissionsAsync({
+                permissions: ['public_profile', 'email'],
+            });
+            if (type === 'success') {
+                console.log(token, 'expires', expires);
+                // Get the user's name using Facebook's Graph API
+                const response = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
+                const responseBody = await response.json();
+                console.log(responseBody);
+                Alert.alert('Logged in!', `Hi ${(await response.json()).name}!`);
+                const userCredential = await firebase.auth().signInWithCredential(firebase.auth.FacebookAuthProvider.credential(token));
+                console.log(userCredential);
+            } else {
+                // type === 'cancel'
+            }
+        } catch ({ message }) {
+            Alert.alert('Error occurred', `Facebook Login Error: ${message}`);
+        }
+    }
+
     const TouchableCmp = Platform.OS === 'ios' ? TouchableOpacity : TouchableNativeFeedback
     return (
         <View style={{ flex: 1, padding: 20 }}>
@@ -84,24 +116,68 @@ const AuthScreen = props => {
                         </TouchableCmp>
                     </View>
                     {
-                        isSignUp ?
-                            <SignUpWithEmailForm
-                                setFormIsValid={setFormIsValid}
-                                setCredentials={setCredentials}
-                            /> :
-                            <SignInWithEmailForm
-                                setFormIsValid={setFormIsValid}
-                                setCredentials={setCredentials}
-                            />
+                        !isEmailAuth ?
+                            <Fragment>
+                                <TouchableOpacity
+                                    style={{ ...styles.authButton, backgroundColor: Colors.primary }}
+                                    onPress={() => {
+                                        setIsEmailAuth(true);
+                                    }}
+                                >
+                                    <MaterialCommunityIcons
+                                        name="email-outline"
+                                        size={25}
+                                        color="white"
+                                    />
+                                    <Text style={{ ...styles.buttonText, marginLeft: 10 }}>{isSignUp ? 'Sign Up with Email' : 'Log In with Email'}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.authButton}
+                                    onPress={() => {
+                                        signInWithFacebook();
+                                    }}
+                                >
+                                    <FontAwesome
+                                        name="facebook"
+                                        size={30}
+                                        color="white"
+                                    />
+                                    <Text style={{ ...styles.buttonText, marginLeft: 10 }}>{isSignUp ? 'Sign Up with Facebook' : 'Log In with Facebook'}</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={{ ...styles.authButton, backgroundColor: 'rgb(231, 59, 46)' }}
+                                    onPress={() => {
+                                        addOrder();
+                                    }}
+                                >
+                                    <MaterialCommunityIcons
+                                        name="google-plus"
+                                        size={30}
+                                        color="white"
+                                    />
+                                    <Text style={{ ...styles.buttonText, marginLeft: 10 }}>{isSignUp ? 'Sign Up with Google' : 'Log In with Google'}</Text>
+                                </TouchableOpacity>
+                            </Fragment>
+                            :
+                            isSignUp ?
+                                <SignUpWithEmailForm
+                                    setFormIsValid={setFormIsValid}
+                                    setCredentials={setCredentials}
+                                /> :
+                                <SignInWithEmailForm
+                                    setFormIsValid={setFormIsValid}
+                                    setCredentials={setCredentials}
+                                />
                     }
 
                 </ScrollView>
             </KeyboardAvoidingView>
-            {!isLoading ?
-                <MainButton onPress={() => { authHandler(credentials) }}>
-                    {isSignUp ? 'Sign Up' : 'Log In'}
-                </MainButton> :
-                <Spinner />
+            {!isEmailAuth ? null :
+                !isLoading ?
+                    <MainButton onPress={() => { authHandler(credentials) }}>
+                        {isSignUp ? 'Sign Up' : 'Log In'}
+                    </MainButton> :
+                    <Spinner />
             }
             <View style={{ paddingHorizontal: 30, bottom: -10 }}>
                 <Text style={styles.terms}>By signing up, you agree to our Terms and Conditions and Privacy Policy</Text>
@@ -153,6 +229,22 @@ const styles = StyleSheet.create({
         borderBottomLeftRadius: 10,
         borderBottomRightRadius: 10,
         paddingHorizontal: 5
+    },
+    authButton: {
+        backgroundColor: 'rgb(51, 79, 141)',
+        height: 50,
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        borderRadius: 30,
+        flexDirection: "row",
+        width: '90%',
+        marginVertical: 10
+    },
+    buttonText: {
+        color: 'white',
+        fontFamily: 'poppins-regular',
+        fontSize: 18,
+        textAlign: 'center'
     }
 });
 

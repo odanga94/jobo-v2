@@ -6,6 +6,7 @@ import { AppLoading } from 'expo';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import ReduxThunk from 'redux-thunk';
 import * as firebase from 'firebase';
+import * as facebook from 'expo-facebook';
 import { Root } from 'native-base';
 
 import JoboNavigator from './navigation/JoboNavigator';
@@ -24,6 +25,8 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
+
+facebook.initializeAsync('918386268604007', 'Jobo');
 
 const fetchFonts = () => {
   return Font.loadAsync({
