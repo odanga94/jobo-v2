@@ -4,16 +4,22 @@ import {
     Text,
     View,
     StyleSheet,
-    Dimensions
-} from 'react-native'
+    Dimensions,
+    TouchableOpacity,
+    Linking
+} from 'react-native';
+import { Feather } from '@expo/vector-icons';
+
+import Card from '../components/UI/Card';
 
 import ENV from '../env';
 import Colors from '../constants/colors';
+import DefaultStyles from '../constants/default-styles';
 
 const { width, height } = Dimensions.get('window');
 
 const OrderSummary = props => {
-    const { orderDetails, date, totalAmount } = props;
+    const { orderDetails, date, totalAmount, proImage, proName } = props;
     const imagePreviewUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${orderDetails.clientLocation.lat},${orderDetails.clientLocation.lng}&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:%7C${orderDetails.clientLocation.lat},${orderDetails.clientLocation.lng}&key=${ENV.googleApiKey}`;
 
     const formatToSentenceCase = text => text.split("")[0].toUpperCase() + text.slice(1);
@@ -29,17 +35,6 @@ const OrderSummary = props => {
                     </View>
                     <Text style={styles.title}>status: <Text style={{ fontFamily: 'poppins-bold', color: Colors.secondary }}>{formatToSentenceCase(orderDetails.status)}</Text></Text>
                 </View>
-
-                {/* <View style={styles.proDetails}>
-                    <View style={styles.imageContainer}>
-                        <Image source={{ uri: proImage }} style={styles.proImage} />
-                    </View>
-                    <View style={styles.proTextContainer}>
-                        <Text style={[styles.description, { textAlign: 'left' }]}>Name:  {proName}</Text>
-                        <Text style={[styles.description, { textAlign: 'left' }]}>Problem:  {problemName}</Text>
-                    </View>
-                </View> */}
-
                 <View style={{ marginVertical: 10 }}>
                     <Text style={styles.title}>You requested for <Text style={{ fontFamily: 'poppins-bold' }}>{formatToSentenceCase(orderDetails.problemType)}</Text> service.</Text>
                     {
@@ -72,8 +67,8 @@ const OrderSummary = props => {
                     }
                     {
                         orderDetails.equipmentNeeded ?
-                        orderDetails.problemType === "moving" ? <Text style={styles.description}>Equipment needed:  {orderDetails.equipmentNeeded}</Text> :
-                        <Text style={styles.description}>Equipment/Supplies provided by:  {orderDetails.equipmentNeeded}</Text> : null
+                            orderDetails.problemType === "moving" ? <Text style={styles.description}>Equipment needed:  {orderDetails.equipmentNeeded}</Text> :
+                                <Text style={styles.description}>Equipment/Supplies provided by:  {orderDetails.equipmentNeeded}</Text> : null
                     }
                     <Text style={styles.description}>Additonal Info:  {orderDetails.optionalInfo}</Text>
                     {
@@ -83,6 +78,38 @@ const OrderSummary = props => {
                         </View>
                     }
                 </View>
+                {
+                    orderDetails.status === "in progress" &&
+                    <Card style={{ padding: 10, marginTop: 10 }}>
+                        <Text style={{ ...styles.title, textAlign: "center" }}><Text style={{ fontFamily: 'poppins-bold' }}>Pro Details</Text></Text>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                            <View style={{ flexDirection: "row", flex: 2 }}>
+                                <View style={styles.imageContainer}>
+                                    <Image source={{ uri: proImage }} style={styles.proImage} />
+                                </View>
+                                <View style={styles.proTextContainer}>
+                                    <Text style={[styles.description, { textAlign: 'left' }]}>{proName}</Text>
+                                </View>
+                            </View>
+                            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        Linking.openURL(`tel:+254722946609`)
+                                    }}
+                                    style={styles.button}
+                                >
+                                    <Feather
+                                        name="phone"
+                                        color="white"
+                                        size={30}
+                                    />
+                                    <Text style={{ ...DefaultStyles.titleText, marginHorizontal: 10, color: "white" }}>Call</Text>
+                                </TouchableOpacity>
+
+                            </View>
+                        </View>
+                    </Card>
+                }
                 <Text style={{ ...styles.title, marginVertical: 15 }}>Connection Fee: <Text style={{ fontFamily: 'poppins-bold' }}>KES.{totalAmount.toFixed(2)}</Text></Text>
 
             </View>
@@ -115,6 +142,14 @@ const styles = StyleSheet.create({
     infoContainer: {
         marginHorizontal: 20,
     },
+    button: {
+        backgroundColor: Colors.secondary,
+        height: 50,
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        borderRadius: 30,
+        flexDirection: "row"
+    },
     datePriceContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -144,6 +179,10 @@ const styles = StyleSheet.create({
         overflow: "hidden",
         marginVertical: 3
     },
+    proImage: {
+        width: '100%',
+        height: '100%'
+    },
     image: {
         width: '100%',
         height: height / 4
@@ -152,7 +191,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
     proTextContainer: {
-        justifyContent: 'center'
+        justifyContent: 'center',
+        marginLeft: 5
     },
 });
 

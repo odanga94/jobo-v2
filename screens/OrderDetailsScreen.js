@@ -15,6 +15,8 @@ const OrderDetailScreen = props => {
                 orderDetails={selectedOrder.orderDetails}
                 date={selectedOrder.readableDate}
                 totalAmount={selectedOrder.totalAmount}
+                proImage={selectedOrder.proImage}
+                proName={selectedOrder.proName}
             />
         </ScrollView>
 

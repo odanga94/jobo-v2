@@ -2,9 +2,10 @@ import * as firebase from 'firebase';
 
 import Order from '../../models/order';
 import { uploadImage } from '../../utility/functions';
-import ENV from '../../env';
+import * as currentJobActions from './currentJob';
 
 export const ADD_ORDER = 'ADD_ORDER';
+export const UPDATE_ORDER = 'UPDATE_ORDER';
 export const SET_ORDERS = 'SET_ORDERS';
 
 export const fetchOrders = (userId) => {
@@ -41,7 +42,12 @@ export const addOrder = (userId, orderDetails, imageUri) => {
             const orderRefArray = orderRef.toString().split('/');
             orderId = orderRefArray[orderRefArray.length - 1];
             //console.log('[ORDER_ID]', orderId);
-
+            await dispatch(currentJobActions.addCurrentJob(orderId));
+            dispatch({
+                type: ADD_ORDER,
+                orderDetails,
+                orderId
+            });
         } catch(err){
             console.log(err);
             throw new Error('Something went wrong 😞');
@@ -54,11 +60,5 @@ export const addOrder = (userId, orderDetails, imageUri) => {
                 throw new Error('Error uploading image but your order was successful.');
             }
         }
-        
-
-        dispatch({
-            type: ADD_ORDER,
-            orderDetails
-        });
     }
 }

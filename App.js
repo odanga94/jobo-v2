@@ -14,6 +14,7 @@ import authReducer from './store/reducers/user/auth';
 import ordersReducer from './store/reducers/orders';
 import profileReducer from './store/reducers/user/profile';
 import locationReducer from './store/reducers/location';
+import currentJobReducer from './store/reducers/currentJob';
 
 const firebaseConfig = {
   apiKey: "AIzaSyAbvDxfinWTNM5cBoZoppej3L6N0pCM13s",
@@ -39,7 +40,8 @@ const rootReducer = combineReducers({
   auth: authReducer,
   orders: ordersReducer,
   profile: profileReducer,
-  location: locationReducer
+  location: locationReducer,
+  currentJob: currentJobReducer
 });
 
 const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(ReduxThunk)));

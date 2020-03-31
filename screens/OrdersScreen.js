@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, Fragment } from 'react';
 import { FlatList } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -49,7 +49,7 @@ const OrdersScreen = props => {
     if (error) {
         return <ErrorMessage retry={loadOrders} error={error} />
     }
-    //console.log(userLocation);
+    //console.log(orders);
 
     return (
         <FlatList

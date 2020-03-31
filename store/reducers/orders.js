@@ -1,5 +1,5 @@
 import Order from '../../models/order';
-import { ADD_ORDER, SET_ORDERS } from '../actions/orders';
+import { ADD_ORDER, SET_ORDERS, UPDATE_ORDER } from '../actions/orders';
 
 const initialState = {
     orders: []
@@ -16,6 +16,29 @@ export default (state = initialState, action) => {
                         action.orderDetails
                     ),
                 )
+            }
+        case UPDATE_ORDER:
+            let indexOfOrderToUpdate;
+            const orderToUpdate = state.orders.find((order, index) => {
+                if (order.id === action.orderId){
+                    indexOfOrderToUpdate = index;
+                    return true;
+                }
+            });
+            //console.log(orderToUpdate);
+            const updatedOrder = new Order(
+                action.orderId,
+                {
+                    ...orderToUpdate.orderDetails,
+                    [action.valueToUpdate]: action.value
+                }
+            )
+            //console.log(updatedOrder);
+            const updatedOrders = [...state.orders];
+            updatedOrders.splice(indexOfOrderToUpdate, 1, updatedOrder);
+            return {
+                ...state,
+                orders: updatedOrders
             }
         case SET_ORDERS:
             return {
