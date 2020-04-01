@@ -31,7 +31,7 @@ const MapScreen = props => {
     const [currentLocationRegion, setCurrentLocationRegion] = useState();
     const [prosLocations, setProsLocations] = useState();
     const [currentJobDetails, setCurrentJobDetails] = useState();
-    const [isFetchingCurrentJobDetails, setIsFetchingCurrentJobDetails] = useState(true);
+    const [isFetchingCurrentJobDetails, setIsFetchingCurrentJobDetails] = useState(false);
 
     useEffect(() => {
         getLocationHandler();
@@ -58,7 +58,12 @@ const MapScreen = props => {
                     valueToUpdate: "status",
                     value: dataSnapShot.val()
                 });
-                
+                if(dataSnapShot.val() === "completed"){
+                    dispatch({
+                        type: currentJobActions.DELETE_CURRENT_JOB
+                    });
+                    setCurrentJobDetails();
+                }
             };
         }
         if (currentJobOrderId){
@@ -73,7 +78,7 @@ const MapScreen = props => {
     }, [currentJobOrderId]);
 
     const fetchCurrentJobDetails = async () => {
-        //setIsFetchingCurrentJobDetails(true);
+        setIsFetchingCurrentJobDetails(true);
         const dataSnapshot = await firebase.database().ref(`orders/${userId}/${currentJobOrderId}`).once('value');
         const resData = dataSnapshot.val();
         setCurrentJobDetails(resData);
@@ -198,13 +203,15 @@ const MapScreen = props => {
                                 });
                             }}>View Job Details</MainButton>
                         </View> :
-                        <Fragment>
+                        <View style={{ flex: 1, justifyContent: "space-between" }}>
+                            <Text style={{ ...defaultStyles.titleText }}>Welcome to Jobo!</Text>
+                            <Text style={defaultStyles.bodyText}>Your one-stop app for Fundis.</Text>
                             <Text style={{ ...defaultStyles.bodyText, fontWeight: 'bold' }}> User ID is: {userId}</Text>
-                            <Text style={defaultStyles.bodyText}>Get 25% discount on your next order!! Valid until 03/04/2020</Text>
+                            <Text style={defaultStyles.bodyText}>Get 25% discount on your first order!! Valid until 03/05/2020</Text>
                             <MainButton onPress={() => {
                                 props.navigation.navigate('Services');
                             }}>View Services</MainButton>
-                        </Fragment>
+                        </View>
                 }
             </Card>
 

@@ -1,6 +1,7 @@
 import * as firebase from 'firebase';
 
 export const SET_CURRENT_JOB = "SET_CURRENT_JOB";
+export const DELETE_CURRENT_JOB = "DELETE_CURRENT_JOB";
 
 export const addCurrentJob = (orderId) => {
     return async (dispatch, getState) => {

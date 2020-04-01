@@ -1,11 +1,13 @@
 import React, { useEffect, useState, useCallback, Fragment } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, View, Text } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
 import OrderItem from '../components/OrderItem';
 import * as orderActions from '../store/actions/orders';
 import Spinner from '../components/UI/Spinner';
 import ErrorMessage from '../components/ErrorMessage';
+import MainButton from '../components/UI/MainButton';
+import DefaultStyles from '../constants/default-styles'
 
 const OrdersScreen = props => {
     const [isLoading, setIsLoading] = useState(false);
@@ -43,11 +45,27 @@ const OrdersScreen = props => {
     }, [loadOrders]);
 
     if (isLoading) {
-        return <Spinner />
+        return (
+            <View style={{flex: 1, justifyContent: "center"}}>
+                <Spinner />
+            </View>
+        ); 
     }
 
     if (error) {
         return <ErrorMessage retry={loadOrders} error={error} />
+    }
+
+    if (orders.length === 0){
+        return (
+            <View style={{flex: 1, justifyContent: "center", paddingHorizontal: 20}}>
+                <Text style={DefaultStyles.titleText}>You haven't placed any orders yet. Get 25% discount on your first order today.</Text>
+                <MainButton
+                    style={{marginTop: 10}}
+                    onPress={() => { props.navigation.navigate('Services') }}
+                >View Services</MainButton>
+            </View>
+        );  
     }
     //console.log(orders);
 

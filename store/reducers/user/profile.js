@@ -9,11 +9,14 @@ const initialState = {
 export default (state = initialState, action) => {
     switch (action.type){
         case FETCH_PROFILE:
-            return {
-                name: action.profileData.name,
-                phone: action.profileData.phone,
-                imageUri: action.profileData.profilePic
+            if(action.profileData){
+                return {
+                    name: action.profileData.name,
+                    phone: action.profileData.phone,
+                    imageUri: action.profileData.profilePic
+                }
             }
+            return state
         case EDIT_PROFILE:
             return {
                 ...state,

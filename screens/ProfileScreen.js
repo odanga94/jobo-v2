@@ -105,13 +105,13 @@ const ProfileScreen = props => {
                 const userData = await dispatch(profileActions.fetchProfile(userId));
                 dispatchFormState({
                     type: FORM_INPUT_UPDATE,
-                    value: userData.name,
+                    value: userData ? userData.name : "",
                     isValid: true,
                     inputLabel: "name"
                 });
                 dispatchFormState({
                     type: FORM_INPUT_UPDATE,
-                    value: userData.phone,
+                    value: userData ? userData.phone : "",
                     isValid: true,
                     inputLabel: "phone"
                 });

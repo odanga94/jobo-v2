@@ -35,19 +35,22 @@ export const fetchOrders = (userId) => {
 }
 
 export const addOrder = (userId, orderDetails, imageUri) => {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
         let orderId;
+        const existingOrders  = getState().orders.orders;
         try {
             const orderRef = await firebase.database().ref(`orders/${userId}`).push(orderDetails);
             const orderRefArray = orderRef.toString().split('/');
             orderId = orderRefArray[orderRefArray.length - 1];
             //console.log('[ORDER_ID]', orderId);
             await dispatch(currentJobActions.addCurrentJob(orderId));
-            dispatch({
-                type: ADD_ORDER,
-                orderDetails,
-                orderId
-            });
+            if(!existingOrders.find(order => order.id === orderId)){
+                dispatch({
+                    type: ADD_ORDER,
+                    orderDetails,
+                    orderId
+                });
+            }
         } catch(err){
             console.log(err);
             throw new Error('Something went wrong 😞');

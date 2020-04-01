@@ -10,6 +10,7 @@ import {
     Platform,
     Dimensions
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import Colors from '../constants/colors';
 import MainButton from './UI/MainButton';
@@ -26,14 +27,27 @@ const OrderItem = props => {
             <View style={styles.order}>
                 <View style={styles.proInfoContainer}>
                     <View style={styles.imageContainer}>
-                        <Image source={{ uri: props.image }} style={styles.image} /*resizeMode='contain'*/ />
+                        {
+                            props.status === "pending" ? 
+                            <Ionicons
+                                color="#505050"
+                                name="ios-person"
+                                size={70}
+                            /> :
+                            <Image source={{ uri: props.image }} style={styles.image} /*resizeMode='contain'*/ />
+                        }    
                     </View>
                     <View>
-                        <Text style={{ ...styles.title, color: "#505050" }}>{props.proName}</Text>
+                        {
+                            props.status === "pending" ?
+                            <Text style={{ ...styles.title, color: "#505050" }}><Text style={styles.date}>Pro unassigned: </Text></Text> :
+                            <Text style={{ ...styles.title, color: "#505050" }}><Text style={styles.date}>Pro Name: </Text>{props.proName}</Text>
+                        }
+                        
                         <Text style={styles.date}>{props.date}</Text>
                     </View>
                 </View>
-                <View style={{ height: '20%', marginBottom: 10 }}>
+                <View style={{ /*height: '20%',*/ marginBottom: 10 }}>
                     <View style={styles.details}>
                         <Text style={styles.title}>{formatToSentenceCase(props.problem)}</Text>
                         <Text style={styles.price}>KES.{props.price.toFixed(2)}</Text>
@@ -97,11 +111,14 @@ const styles = StyleSheet.create({
         borderColor: Colors.secondary,
         overflow: "hidden",
         marginVertical: 3,
-        marginRight: 10
+        marginRight: 10,
+        alignItems: "center",
+        justifyContent: "center"
     },
     proInfoContainer: {
         flexDirection: "row",
-        alignItems: "center"
+        alignItems: "center",
+        marginTop: 3
     },
     date: {
         fontSize: 16,

@@ -63,7 +63,8 @@ const AuthScreen = props => {
         }
     }
 
-    const signInWithFacebook = async () => {
+    const facebookAuthHandler = async () => {
+        setIsLoading(true);
         try {
             const {
                 type,
@@ -80,13 +81,35 @@ const AuthScreen = props => {
                 const response = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
                 const responseBody = await response.json();
                 console.log(responseBody);
-                Alert.alert('Logged in!', `Hi ${(await response.json()).name}!`);
+                //Alert.alert('Logged in!', `Hi ${responseBody.name}!`);
                 const userCredential = await firebase.auth().signInWithCredential(firebase.auth.FacebookAuthProvider.credential(token));
                 console.log(userCredential);
+                const userId = userCredential.user.uid;
+                if (userCredential.additionalUserInfo.isNewUser) {
+                    const userName = userCredential.user.displayName;
+                    const profilePicUrl = userCredential.user.photoURL;
+                    const date = new Date(userCredential.user.createdAt).toString()
+                    await firebase.database().ref(`user_profiles/${userId}`)
+                        .set({
+                            name: userName,
+                            phone: "",
+                            created_At: date,
+                            profilePic: profilePicUrl
+                        });
+                        /*.then((res) => {
+                            //console.log(res);
+                            dispatch(authenticate(response.user.uid));
+                        }).catch(err => {
+                            throw new Error(err);
+                        })*/
+                }
+                dispatch(authActions.authenticate(userId, true));
             } else {
-                // type === 'cancel'
+                //type === 'cancel'
+                setIsLoading(false);
             }
         } catch ({ message }) {
+            setIsLoading(false);
             Alert.alert('Error occurred', `Facebook Login Error: ${message}`);
         }
     }
@@ -117,6 +140,7 @@ const AuthScreen = props => {
                     </View>
                     {
                         !isEmailAuth ?
+                            isLoading ? <Spinner /> :
                             <Fragment>
                                 <TouchableOpacity
                                     style={{ ...styles.authButton, backgroundColor: Colors.primary }}
@@ -134,7 +158,7 @@ const AuthScreen = props => {
                                 <TouchableOpacity
                                     style={styles.authButton}
                                     onPress={() => {
-                                        signInWithFacebook();
+                                        facebookAuthHandler()
                                     }}
                                 >
                                     <FontAwesome
