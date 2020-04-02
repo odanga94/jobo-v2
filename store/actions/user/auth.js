@@ -14,12 +14,13 @@ const saveDataToStorage = (token, userId, expirationDate) => {
     }));
 };
 
-export const authenticate = (userId, isFacebookUser, isNewUser) => {
+export const authenticate = (userId, isFacebookUser, isGoogleUser) => {
     return dispatch =>  {
         dispatch({
             type: AUTHENTICATE,
             userId,
-            isFacebookUser: isFacebookUser
+            isFacebookUser: isFacebookUser,
+            isGoogleUser: isGoogleUser
         });
     }
 }

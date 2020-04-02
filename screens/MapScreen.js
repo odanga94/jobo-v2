@@ -13,7 +13,8 @@ import Spinner from '../components/UI/Spinner';
 import defaultStyles from '../constants/default-styles';
 import * as locationActions from '../store/actions/location';
 import * as currentJobActions from '../store/actions/currentJob';
-import { ADD_ORDER, UPDATE_ORDER } from '../store/actions/orders';
+import { ADD_ORDER, UPDATE_ORDER, fetchOrders } from '../store/actions/orders';
+import { HAS_ORDERS } from '../store/actions/user/profile';
 import Colors from '../constants/colors';
 //import prosLocs from '../data/markers';
 
@@ -26,6 +27,8 @@ const MapScreen = props => {
     const dispatch = useDispatch();
     const userId = useSelector(state => state.auth.userId);
     const currentJobOrderId = useSelector(state => state.currentJob.currentJobOrderId);
+    const hasOrders = useSelector(state => state.profile.hasOrders); 
+    //console.log('hasOrders', hasOrders);
 
     const [isFetchingLocation, setIsFetchingLocation] = useState(false);
     const [currentLocationRegion, setCurrentLocationRegion] = useState();
@@ -40,7 +43,11 @@ const MapScreen = props => {
 
     useEffect(() => {
         checkIfCurrentJob();
-    }, [checkIfCurrentJob])
+    }, [checkIfCurrentJob]);
+
+    useEffect(() => {
+        checkIfUserHasOrderHistory();
+    }, [checkIfUserHasOrderHistory]);
 
     useEffect(() => {
         const currentJobRef = firebase.database().ref(`orders/${userId}/${currentJobOrderId}`);
@@ -104,6 +111,20 @@ const MapScreen = props => {
             }
         }
     }, [userId]);
+
+    const checkIfUserHasOrderHistory = useCallback(async () => {
+        if (userId) {
+            const dataSnapShot = await firebase.database().ref(`orders/${userId}`).once('value');
+            const resData = dataSnapShot.val();
+            //console.log(resData)
+            if(resData === null){
+                dispatch({
+                    type: HAS_ORDERS,
+                    hasOrders: false
+                });
+            }
+        }
+    }, [userId])
 
     const verifyPermissions = async () => {
         const result = await Permissions.askAsync(Permissions.LOCATION);
@@ -207,7 +228,7 @@ const MapScreen = props => {
                             <Text style={{ ...defaultStyles.titleText }}>Welcome to Jobo!</Text>
                             <Text style={defaultStyles.bodyText}>Your one-stop app for Fundis.</Text>
                             <Text style={{ ...defaultStyles.bodyText, fontWeight: 'bold' }}> User ID is: {userId}</Text>
-                            <Text style={defaultStyles.bodyText}>Get 25% discount on your first order!! Valid until 03/05/2020</Text>
+                        { !hasOrders && <Text style={defaultStyles.bodyText}>Get 25% discount on your first order!! Valid until 03/05/2020</Text> }
                             <MainButton onPress={() => {
                                 props.navigation.navigate('Services');
                             }}>View Services</MainButton>

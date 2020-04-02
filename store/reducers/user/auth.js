@@ -3,6 +3,7 @@ import { AUTHENTICATE, LOG_OUT } from '../../actions/user/auth';
 const initialState = {
     userId: null,
     isFacebookUser: false,
+    isGoogleUser: false
 }
 
 const authReducer = (state = initialState, action) => {
@@ -10,7 +11,8 @@ const authReducer = (state = initialState, action) => {
         case AUTHENTICATE:
             return {
                 userId: action.userId,
-                isFacebookUser: action.isFacebookUser ? action.isFacebookUser : false
+                isFacebookUser: action.isFacebookUser ? action.isFacebookUser : false,
+                isGoogleUser: action.isGoogleUser ? action.isGoogleUser : false
             }
         case LOG_OUT:
             return initialState

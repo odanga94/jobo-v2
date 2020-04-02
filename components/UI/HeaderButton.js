@@ -10,7 +10,7 @@ export const IoniconHeaderButton = props => {
         <HeaderButton
             {...props}
             IconComponent={Ionicons}
-            iconSize={23}
+            iconSize={27}
             color={Platform.OS === 'android' ? 'white' : Colors.primary}
         />
     );

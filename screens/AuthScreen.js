@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import * as facebook from 'expo-facebook';
 import * as firebase from 'firebase';
+import * as Google from 'expo-google-app-auth';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 
@@ -76,19 +77,19 @@ const AuthScreen = props => {
                 permissions: ['public_profile', 'email'],
             });
             if (type === 'success') {
-                console.log(token, 'expires', expires);
+                //console.log(token, 'expires', expires);
                 // Get the user's name using Facebook's Graph API
-                const response = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
-                const responseBody = await response.json();
-                console.log(responseBody);
+                // const response = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
+                // const responseBody = await response.json();
+                // console.log(responseBody);
                 //Alert.alert('Logged in!', `Hi ${responseBody.name}!`);
                 const userCredential = await firebase.auth().signInWithCredential(firebase.auth.FacebookAuthProvider.credential(token));
-                console.log(userCredential);
+                //console.log(userCredential);
                 const userId = userCredential.user.uid;
                 if (userCredential.additionalUserInfo.isNewUser) {
                     const userName = userCredential.user.displayName;
                     const profilePicUrl = userCredential.user.photoURL;
-                    const date = new Date(userCredential.user.createdAt).toString()
+                    const date = new Date().toString()
                     await firebase.database().ref(`user_profiles/${userId}`)
                         .set({
                             name: userName,
@@ -96,12 +97,12 @@ const AuthScreen = props => {
                             created_At: date,
                             profilePic: profilePicUrl
                         });
-                        /*.then((res) => {
-                            //console.log(res);
-                            dispatch(authenticate(response.user.uid));
-                        }).catch(err => {
-                            throw new Error(err);
-                        })*/
+                    /*.then((res) => {
+                        //console.log(res);
+                        dispatch(authenticate(response.user.uid));
+                    }).catch(err => {
+                        throw new Error(err);
+                    })*/
                 }
                 dispatch(authActions.authenticate(userId, true));
             } else {
@@ -112,6 +113,42 @@ const AuthScreen = props => {
             setIsLoading(false);
             Alert.alert('Error occurred', `Facebook Login Error: ${message}`);
         }
+    }
+
+    const googleAuthHandler = async () => {
+        setIsLoading(true);
+        try {
+            const { type, idToken, accessToken, user } = await Google.logInAsync({
+                iosClientId: '606625555327-ia9u5s5plimsg7360pjp5mcu6kc9dp8m.apps.googleusercontent.com',
+                androidClientId: '606625555327-904ok6kequmidff43huhnssoqkf8d16q.apps.googleusercontent.com'
+            });
+    
+            if (type === 'success') {
+                //console.log('user', user);
+                const userCredential = await firebase.auth().signInWithCredential(firebase.auth.GoogleAuthProvider.credential(idToken, accessToken));
+                //console.log(userCredential);
+                const userId = userCredential.user.uid;
+                if (userCredential.additionalUserInfo.isNewUser) {
+                    const userName = userCredential.user.displayName;
+                    const profilePicUrl = userCredential.user.photoURL;
+                    const date = new Date().toString()
+                    await firebase.database().ref(`user_profiles/${userId}`)
+                        .set({
+                            name: userName,
+                            phone: "",
+                            created_At: date,
+                            profilePic: profilePicUrl
+                        });
+                }
+                dispatch(authActions.authenticate(userId, false, true));
+            } else {
+                // type === 'cancel'
+                setIsLoading(false);
+            }
+        } catch ({ message }) {
+            setIsLoading(false);
+            Alert.alert('Error occurred', `Google Login Error: ${message}`);
+        }  
     }
 
     const TouchableCmp = Platform.OS === 'ios' ? TouchableOpacity : TouchableNativeFeedback
@@ -141,47 +178,47 @@ const AuthScreen = props => {
                     {
                         !isEmailAuth ?
                             isLoading ? <Spinner /> :
-                            <Fragment>
-                                <TouchableOpacity
-                                    style={{ ...styles.authButton, backgroundColor: Colors.primary }}
-                                    onPress={() => {
-                                        setIsEmailAuth(true);
-                                    }}
-                                >
-                                    <MaterialCommunityIcons
-                                        name="email-outline"
-                                        size={25}
-                                        color="white"
-                                    />
-                                    <Text style={{ ...styles.buttonText, marginLeft: 10 }}>{isSignUp ? 'Sign Up with Email' : 'Log In with Email'}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.authButton}
-                                    onPress={() => {
-                                        facebookAuthHandler()
-                                    }}
-                                >
-                                    <FontAwesome
-                                        name="facebook"
-                                        size={30}
-                                        color="white"
-                                    />
-                                    <Text style={{ ...styles.buttonText, marginLeft: 10 }}>{isSignUp ? 'Sign Up with Facebook' : 'Log In with Facebook'}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={{ ...styles.authButton, backgroundColor: 'rgb(231, 59, 46)' }}
-                                    onPress={() => {
-                                        addOrder();
-                                    }}
-                                >
-                                    <MaterialCommunityIcons
-                                        name="google-plus"
-                                        size={30}
-                                        color="white"
-                                    />
-                                    <Text style={{ ...styles.buttonText, marginLeft: 10 }}>{isSignUp ? 'Sign Up with Google' : 'Log In with Google'}</Text>
-                                </TouchableOpacity>
-                            </Fragment>
+                                <Fragment>
+                                    <TouchableOpacity
+                                        style={{ ...styles.authButton, backgroundColor: Colors.primary }}
+                                        onPress={() => {
+                                            setIsEmailAuth(true);
+                                        }}
+                                    >
+                                        <MaterialCommunityIcons
+                                            name="email-outline"
+                                            size={25}
+                                            color="white"
+                                        />
+                                        <Text style={{ ...styles.buttonText, marginLeft: 10 }}>{isSignUp ? 'Sign Up with Email' : 'Log In with Email'}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={{ ...styles.authButton, backgroundColor: 'rgb(231, 59, 46)' }}
+                                        onPress={() => {
+                                            googleAuthHandler();
+                                        }}
+                                    >
+                                        <MaterialCommunityIcons
+                                            name="google-plus"
+                                            size={30}
+                                            color="white"
+                                        />
+                                        <Text style={{ ...styles.buttonText, marginLeft: 10 }}>{isSignUp ? 'Sign Up with Google' : 'Log In with Google'}</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.authButton}
+                                        onPress={() => {
+                                            facebookAuthHandler();
+                                        }}
+                                    >
+                                        <FontAwesome
+                                            name="facebook"
+                                            size={30}
+                                            color="white"
+                                        />
+                                        <Text style={{ ...styles.buttonText, marginLeft: 10 }}>{isSignUp ? 'Sign Up with Facebook' : 'Log In with Facebook'}</Text>
+                                    </TouchableOpacity>
+                                </Fragment>
                             :
                             isSignUp ?
                                 <SignUpWithEmailForm
