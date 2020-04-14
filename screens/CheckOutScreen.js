@@ -40,6 +40,9 @@ const CheckOutScreen = props => {
         setAddOrderLoading(true);
         try {
             await dispatch(orderActions.addOrder(userId, orderDetails, problemImage));
+            dispatch({
+                type: orderActions.SORT_ORDERS
+            });
             setAddOrderLoading(false);
             navigation.navigate('Map');
         } catch (err) {

@@ -1,13 +1,13 @@
 {
   "expo": {
     "name": "Jobo",
-    "slug": "jobo-v2",
+    "slug": "jobo",
+    "description": "Your one-stop app for Fundis.",
     "privacy": "public",
     "sdkVersion": "36.0.0",
     "platforms": [
       "ios",
-      "android",
-      "web"
+      "android"
     ],
     "version": "1.0.0",
     "orientation": "portrait",
@@ -24,12 +24,25 @@
       "**/*"
     ],
     "ios": {
+      "bundleIdentifier": "com.odanga.jobo",
+      "buildNumber": "1.0.0",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.odanga.jobo",
+      "versionCode": 2,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "config": {
+        "googleSignIn": {
+          "apiKey": "AIzaSyC9bYVxy8xWFkXYiWDlANQrhrQ4uplWLCg",
+          "certificateHash": "417159898AC88A742E1824342F49896A84875FF5"
+        },
+        "googleMaps": {
+          "apiKey": "AIzaSyBD7RtYlg5sRPU4EPu3yfHCZHWHf0fxSf4"
+        }
       }
     }
   }

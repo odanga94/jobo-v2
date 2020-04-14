@@ -66,7 +66,7 @@ const SignInWithEmailForm = props => {
                 autoCapitalize="none"
                 errorText="Please enter a valid email address."
                 onInputChange={inputChangeHandler}
-                initialValue="ag451157.john@gmail.com"
+                initialValue=""
                 style={styles.textInput}
             />
             <Input
@@ -79,7 +79,7 @@ const SignInWithEmailForm = props => {
                 autoCapitalize="none"
                 errorText="Please enter a valid password."
                 onInputChange={inputChangeHandler}
-                initialValue="123456"
+                initialValue=""
                 style={styles.textInput}
             />
         </Fragment>

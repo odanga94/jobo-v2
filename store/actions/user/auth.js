@@ -1,18 +1,7 @@
-import { AsyncStorage } from 'react-native';
 import * as firebase from 'firebase';
-
-const API_KEY = 'AIzaSyB7A0YodCgm6OxVnGK0tH71s1W42ZogEWc';
 
 export const AUTHENTICATE = 'AUTHENTICATE';
 export const LOG_OUT = 'LOG_OUT';
-
-const saveDataToStorage = (token, userId, expirationDate) => {
-    AsyncStorage.setItem('userData', JSON.stringify({
-        token,
-        userId,
-        expiryDate: expirationDate.toISOString()
-    }));
-};
 
 export const authenticate = (userId, isFacebookUser, isGoogleUser) => {
     return dispatch =>  {
@@ -65,13 +54,5 @@ export const logOut = () => {
         dispatch({
             type: LOG_OUT
         })
-    }
-}
-
-const setLogoutTimer = expirationTime => {
-    return dispatch => {
-        timer = setTimeout(() => {
-            dispatch(logOut());
-        }, expirationTime)
     }
 }

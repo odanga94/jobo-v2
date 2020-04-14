@@ -125,8 +125,8 @@ const SupportScreen = props => {
 
     if (fetchTicketsErr) {
         return (
-            <View style={{ justifyContent: "center", alignItems: "center", flex: 1 }}>
-                <Text style={DefaultStyles.titleText}>{fetchTicketsErr}</Text>
+            <View style={{ justifyContent: "center", alignItems: "center", flex: 1, paddingHorizontal: 20 }}>
+                <Text style={{...DefaultStyles.titleText, textAlign: "center" }}>{fetchTicketsErr}</Text>
                 <MainButton onPress={fetchTickets} style={{ marginTop: 10 }}>
                     Try Again
                 </MainButton>

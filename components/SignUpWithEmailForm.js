@@ -69,7 +69,7 @@ const SignUpWithEmailForm = props => {
                 autoCapitalize="none"
                 errorText="Please enter a valid email address."
                 onInputChange={inputChangeHandler}
-                initialValue="ag451157.john@gmail.com"
+                initialValue=""
                 style={styles.textInput}
             />
             <Input
@@ -82,7 +82,7 @@ const SignUpWithEmailForm = props => {
                 autoCapitalize="none"
                 errorText="Please enter a valid password."
                 onInputChange={inputChangeHandler}
-                initialValue="123456"
+                initialValue=""
                 style={styles.textInput}
             />
             <Input
@@ -95,7 +95,7 @@ const SignUpWithEmailForm = props => {
                 autoCapitalize="none"
                 errorText="Passwords do not match"
                 onInputChange={inputChangeHandler}
-                initialValue="123456"
+                initialValue=""
                 style={styles.textInput}
             />
             <Input
@@ -107,7 +107,7 @@ const SignUpWithEmailForm = props => {
                 autoCapitalize="none"
                 errorText="Please enter a valid name."
                 onInputChange={inputChangeHandler}
-                initialValue="John Odanga"
+                initialValue=""
                 style={styles.textInput}
             />
             <Input
@@ -120,7 +120,7 @@ const SignUpWithEmailForm = props => {
                 autoCapitalize="none"
                 errorText="Please enter a valid phone number."
                 onInputChange={inputChangeHandler}
-                initialValue="0799848807"
+                initialValue=""
                 style={styles.textInput}
             />
         </Fragment>

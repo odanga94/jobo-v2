@@ -1,6 +1,8 @@
 import ENV from '../env';
 import * as firebase from 'firebase';
 
+//add form reducer as well
+
 export const fetchAddress = async (lat, lng) => {
     const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${ENV.googleApiKey}`);
     if (!response.ok){

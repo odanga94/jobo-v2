@@ -120,7 +120,8 @@ const AuthScreen = props => {
         try {
             const { type, idToken, accessToken, user } = await Google.logInAsync({
                 iosClientId: '606625555327-ia9u5s5plimsg7360pjp5mcu6kc9dp8m.apps.googleusercontent.com',
-                androidClientId: '606625555327-904ok6kequmidff43huhnssoqkf8d16q.apps.googleusercontent.com'
+                androidClientId: '606625555327-904ok6kequmidff43huhnssoqkf8d16q.apps.googleusercontent.com',
+                androidStandaloneAppClientId: '606625555327-k3fbrf7vf08gp2oe820c9hq69eihfddo.apps.googleusercontent.com'
             });
     
             if (type === 'success') {
@@ -235,7 +236,7 @@ const AuthScreen = props => {
             </KeyboardAvoidingView>
             {!isEmailAuth ? null :
                 !isLoading ?
-                    <MainButton onPress={() => { authHandler(credentials) }}>
+                    <MainButton style={{marginTop: 10}} onPress={() => { authHandler(credentials) }}>
                         {isSignUp ? 'Sign Up' : 'Log In'}
                     </MainButton> :
                     <Spinner />

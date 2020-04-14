@@ -7,61 +7,218 @@ import * as currentJobActions from './currentJob';
 export const ADD_ORDER = 'ADD_ORDER';
 export const UPDATE_ORDER = 'UPDATE_ORDER';
 export const SET_ORDERS = 'SET_ORDERS';
+export const SORT_ORDERS = 'SORT_ORDERS';
+
+const getProDetails = async (problemType, proId) => {
+    const dataSnapshot = await firebase.database().ref(`pros/${problemType}/${proId}`).once('value');
+    const resData = dataSnapshot.val();
+    //console.log(resData);
+    return resData;
+}
+
+const getProImageUrl = async (problemType, proId) => {
+    let imageDownloadUrl;
+    try {
+        imageDownloadUrl = await firebase.storage().ref(`images/pros/${problemType}/${proId}/passport-img.jpg`).getDownloadURL();
+        //console.log(imageDownloadUrl);
+        return imageDownloadUrl;
+    } catch (err) {
+        //console.log(err.code_);
+        try {
+            if (err.code_ === "storage/object-not-found") {
+                imageDownloadUrl = await firebase.storage().ref(`images/pros/${problemType}/${proId}/passport-img.jpeg`).getDownloadURL();
+                //console.log(imageDownloadUrl);
+                return imageDownloadUrl;
+            }
+        } catch (err) {
+            if (err.code_ === "storage/object-not-found") {
+                imageDownloadUrl = await firebase.storage().ref(`images/pros/${problemType}/${proId}/passport-img.png`).getDownloadURL();
+                //console.log(imageDownloadUrl);
+                return imageDownloadUrl;
+            }
+            throw new Error(err.message);
+        }
+    }
+}
 
 export const fetchOrders = (userId) => {
-    return async dispatch => {
+    return async (dispatch, getState) => {
+        const existingOrders = getState().orders.orders;
+        //const fetchedOrders = [];
         try {
             const dataSnapshot = await firebase.database().ref(`orders/${userId}`).once('value');
             const resData = dataSnapshot.val();
-            //console.log(resData);
+            if(!resData){
+                dispatch({
+                    type: SET_ORDERS,
+                    orders: []
+                });
+                return;
+            }
 
-            const loadedOrders = resData ? Object.keys(resData).map(key => {
+            const fetchedOrders = Object.keys(resData).map(orderId => {
                 return new Order(
-                    key,
-                    { ...resData[key] }
-                );
-            }) : [];
-            loadedOrders.sort((a, b) => a.orderDetails.dateRequested > b.orderDetails.dateRequested ? -1 : 1)
-            //console.log(loadedOrders);*/
+                    orderId,
+                    { ...resData[orderId] }
+                )
+            });
+            
+            for (let i = fetchedOrders.length - 1; i >= 0; i--) {
+                if (fetchedOrders[i].orderDetails.assignedProId) {
+                    let proDetails = "";
+                    let proImageUrl = "";
+                    try {
+                        proDetails = await getProDetails(fetchedOrders[i].orderDetails.problemType, fetchedOrders[i].orderDetails.assignedProId);
+                        //console.log(proDetails)
+                    } catch (err) {
+                        console.log(err);
+                    }
+                    try {
+                        proImageUrl = await getProImageUrl(fetchedOrders[i].orderDetails.problemType, fetchedOrders[i].orderDetails.assignedProId);
+                        //console.log(proImageUrl)
+                    } catch (err) {
+                        console.log(err);
+                    }
+                    if(!existingOrders.find(order => order.id === fetchedOrders[i].id)){
+                        dispatch({
+                            type: ADD_ORDER,
+                            orderId: fetchedOrders[i].id,
+                            orderDetails: {
+                                ...fetchedOrders[i].orderDetails,
+                                proName: proDetails ? `${proDetails.firstName} ${proDetails.lastName}` : "",
+                                proPhone: proDetails ? proDetails.phone : "",
+                                proImage: proImageUrl ? proImageUrl : ""
+                            }
+                        });
+                    }
+                    
+                } else {
+                    if(!existingOrders.find(order => order.id === fetchedOrders[i].id)){
+                        dispatch({
+                            type: ADD_ORDER,
+                            orderId: fetchedOrders[i].id,
+                            orderDetails: {
+                                ...fetchedOrders[i].orderDetails,
+                            }
+                        });
+                    }
+                }
+            }
+            /* let newOrderDetails;
+            for (let orderId in resData) {
+                if (resData[orderId].assignedProId) {
+                    //console.log(resData[orderId].assignedProId, resData[orderId].problemType)
+                    let proDetails = "";
+                    let proImageUrl = "";
+                    try {
+                        proDetails = await getProDetails(resData[orderId].problemType, resData[orderId].assignedProId);
+                        //console.log(proDetails)
+                    } catch (err) {
+                        console.log(err);
+                    }
+                    try {
+                        proImageUrl = await getProImageUrl(resData[orderId].problemType, resData[orderId].assignedProId);
+                        //console.log(proImageUrl)
+                    } catch (err) {
+                        console.log(err);
+                    }
+                    newOrderDetails =
+                    {
+                        ...resData[orderId],
+                        proName: proDetails ? `${proDetails.firstName} ${proDetails.lastName}` : "",
+                        proPhone: proDetails ? proDetails.phone : "",
+                        proImage: proImageUrl ? proImageUrl : ""
+                    }
+                } else {
+                    newOrderDetails =
+                    {
+                        ...resData[orderId]
+                    }
+                }
+                const newOrder = new Order(
+                    orderId,
+                    newOrderDetails
+                )
+                fetchedOrders.push(newOrder);
+            }
             dispatch({
                 type: SET_ORDERS,
-                orders: loadedOrders
-            });
-        } catch (err){
+                orders: fetchedOrders
+            }); */
+        } catch (err) {
             console.log(err);
             throw new Error('Something went wrong 😞');
-        }    
         }
+    }
 }
 
 export const addOrder = (userId, orderDetails, imageUri) => {
     return async (dispatch, getState) => {
         let orderId;
-        const existingOrders  = getState().orders.orders;
+        const existingOrders = getState().orders.orders;
         try {
             const orderRef = await firebase.database().ref(`orders/${userId}`).push(orderDetails);
             const orderRefArray = orderRef.toString().split('/');
             orderId = orderRefArray[orderRefArray.length - 1];
             //console.log('[ORDER_ID]', orderId);
             await dispatch(currentJobActions.addCurrentJob(orderId));
-            if(!existingOrders.find(order => order.id === orderId)){
+            if (!existingOrders.find(order => order.id === orderId)) {
                 dispatch({
                     type: ADD_ORDER,
                     orderDetails,
                     orderId
                 });
             }
-        } catch(err){
+        } catch (err) {
             console.log(err);
             throw new Error('Something went wrong 😞');
         }
-        if(imageUri){
+        if (imageUri) {
             try {
                 const firebaseImageUri = await uploadImage(imageUri, `images/${userId}/orders/${orderId}/problemImage.jpg`);
                 await firebase.database().ref(`orders/${userId}/${orderId}`).update({ problemImage: firebaseImageUri });
-            } catch(err){
+            } catch (err) {
                 throw new Error('Error uploading image but your order was successful.');
             }
         }
+    }
+}
+
+export const fetchProDetails = (problemType, proId, orderId) => {
+    return async (dispatch) => {
+        //console.log('fromFetchPro', problemType, proId, orderId);
+        let proDetails = "";
+        try {
+            proDetails = await getProDetails(problemType, proId);
+            //console.log('from fetchPro', proDetails)
+        } catch (err) {
+            console.log(err);
+        }
+        dispatch({
+            type: UPDATE_ORDER,
+            orderId,
+            valueToUpdate: "proName",
+            value: proDetails ? `${proDetails.firstName} ${proDetails.lastName}` : ""
+        });
+        dispatch({
+            type: UPDATE_ORDER,
+            orderId,
+            valueToUpdate: "proPhone",
+            value: proDetails ? `${proDetails.phone}` : ""
+        });
+        let imageDownloadUrl;
+        try {
+            imageDownloadUrl = await getProImageUrl(problemType, proId);
+            //console.log('from fetchPro', proImageUrl)
+        } catch (err) {
+            console.log(err);
+        }
+        dispatch({
+            type: UPDATE_ORDER,
+            orderId,
+            valueToUpdate: "proImage",
+            value: imageDownloadUrl
+        });
+
     }
 }

@@ -14,13 +14,15 @@ const OrdersScreen = props => {
     const [error, setError] = useState();
 
     const userId = useSelector(state => state.auth.userId)
-    const orders = useSelector(state => state.orders.orders);
-    const userLocation = useSelector(state => state.location.userLocation);
+    const orders = useSelector(state => state.orders.orders/*.sort((a, b) => a.orderDetails.dateRequested > b.orderDetails.dateRequested ? -1 : 1)*/);
     const dispatch = useDispatch();
 
     const loadOrders = useCallback(async () => {
         setError(null);
-        setIsLoading(true);
+        //console.log(orders.length)
+        if(orders.length === 0){
+            setIsLoading(true);
+        }
         try {
             await dispatch(orderActions.fetchOrders(userId));
         } catch (err) {
@@ -33,16 +35,22 @@ const OrdersScreen = props => {
 
     useEffect(() => {
         loadOrders();
-    }, [dispatch, loadOrders]);
+    }, [loadOrders]);
 
     useEffect(() => {
+        if(orders.length > 0){
+            setIsLoading(false);
+        }
+    }, [orders])
+
+    /* useEffect(() => {
         const WillFocusSub = props.navigation.addListener('willFocus', () => {
             loadOrders();
         });
         return () => {
             WillFocusSub.remove();
         }
-    }, [loadOrders]);
+    }, [loadOrders]); */
 
     if (isLoading) {
         return (
@@ -77,12 +85,10 @@ const OrdersScreen = props => {
             keyExtractor={item => item.id}
             renderItem={itemData => (
                 <OrderItem
-                    image={itemData.item.proImage}
-                    problem={itemData.item.orderDetails.problemType}
-                    status={itemData.item.orderDetails.status}
+                    orderId={itemData.item.id}
+                    orderDetails={itemData.item.orderDetails}
                     price={itemData.item.totalAmount}
                     date={itemData.item.readableDate}
-                    proName={itemData.item.proName}
                     onViewDetail={() => {
                         props.navigation.navigate({
                             routeName: 'OrderDetails',

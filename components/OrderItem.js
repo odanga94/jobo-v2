@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     View,
     Text,
@@ -10,16 +10,19 @@ import {
     Platform,
     Dimensions
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useDispatch } from 'react-redux';
 
 import Colors from '../constants/colors';
 import MainButton from './UI/MainButton';
-import DefaultStyles from '../constants/default-styles'
+import DefaultStyles from '../constants/default-styles';
+import * as orderActions from '../store/actions/orders';
 
 const { height } = Dimensions.get('window');
+const formatToSentenceCase = text => text.split("")[0].toUpperCase() + text.slice(1);
 
 const OrderItem = props => {
-    const formatToSentenceCase = text => text.split("")[0].toUpperCase() + text.slice(1);
+    const dispatch = useDispatch();
+    const { orderDetails, orderId } = props;
 
     const TouchableCmp = Platform.OS === 'android' && Platform.Version >= 21 ? TouchableNativeFeedback : TouchableOpacity;
     return (
@@ -28,20 +31,16 @@ const OrderItem = props => {
                 <View style={styles.proInfoContainer}>
                     <View style={styles.imageContainer}>
                         {
-                            props.status === "pending" ? 
-                            <Ionicons
-                                color="#505050"
-                                name="ios-person"
-                                size={70}
-                            /> :
-                            <Image source={{ uri: props.image }} style={styles.image} /*resizeMode='contain'*/ />
+                            orderDetails.status === "pending" ? 
+                            <Image source={require('../assets/pro-icon.png')} style={styles.image} /> :
+                            <Image source={{ uri: orderDetails.proImage }} style={styles.image} /*resizeMode='contain'*/ />
                         }    
                     </View>
                     <View>
                         {
-                            props.status === "pending" ?
-                            <Text style={{ ...styles.title, color: "#505050" }}><Text style={styles.date}>Pro unassigned: </Text></Text> :
-                            <Text style={{ ...styles.title, color: "#505050" }}><Text style={styles.date}>Pro Name: </Text>{props.proName}</Text>
+                            orderDetails.status === "pending" ?
+                            <Text style={{ ...styles.title, color: "#505050" }}><Text style={styles.date}>Pro unassigned </Text></Text> :
+                            <Text style={{ ...styles.title, color: "#505050" }}><Text style={styles.date}>Pro Name: </Text>{orderDetails.proName}</Text> 
                         }
                         
                         <Text style={styles.date}>{props.date}</Text>
@@ -49,10 +48,10 @@ const OrderItem = props => {
                 </View>
                 <View style={{ /*height: '20%',*/ marginBottom: 10 }}>
                     <View style={styles.details}>
-                        <Text style={styles.title}>{formatToSentenceCase(props.problem)}</Text>
+                        <Text style={styles.title}>{formatToSentenceCase(orderDetails.problemType)}</Text>
                         <Text style={styles.price}>KES.{props.price.toFixed(2)}</Text>
                     </View>
-                    <Text style={DefaultStyles.bodyText}>status:  <Text style={{color: Colors.secondary}}>{formatToSentenceCase(props.status)}</Text></Text>
+                    <Text style={DefaultStyles.bodyText}>status:  <Text style={{color: Colors.secondary}}>{formatToSentenceCase(orderDetails.status)}</Text></Text>
                 </View>
                 <View style={styles.actions} >
                     <MainButton onPress={props.onViewDetail} style={{ paddingHorizontal: 12.5, paddingVertical: 5 }}>
