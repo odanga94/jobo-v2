@@ -30,7 +30,7 @@
     },
     "android": {
       "package": "com.odanga.jobo",
-      "versionCode": 2,
+      "versionCode": 3,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"

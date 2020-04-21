@@ -15,7 +15,7 @@ import defaultStyles from '../constants/default-styles';
 import * as locationActions from '../store/actions/location';
 import * as currentJobActions from '../store/actions/currentJob';
 import * as orderActions from '../store/actions/orders';
-import { ADD_ORDER, UPDATE_ORDER, fetchOrders } from '../store/actions/orders';
+import { ADD_ORDER, UPDATE_ORDER, dispatchNewOrder } from '../store/actions/orders';
 import { HAS_ORDERS } from '../store/actions/user/profile';
 import Colors from '../constants/colors';
 
@@ -25,6 +25,8 @@ const getreadableDate = (date) => {
 }
 
 const MapScreen = props => {
+    const fromCheckout = props.navigation.getParam('fromCheckout');
+
     const dispatch = useDispatch();
     const userId = useSelector(state => state.auth.userId);
     const currentJobOrderId = useSelector(state => state.currentJob.currentJobOrderId);
@@ -83,10 +85,9 @@ const MapScreen = props => {
             }
         }
         if (currentJobOrderId) {
-            fetchCurrentJobDetails();
             currentJobRef.on("child_changed", onChildChanged);
         }
-
+        
         return () => {
             currentJobRef.off("child_changed", onChildChanged);
         }
@@ -97,19 +98,22 @@ const MapScreen = props => {
         if (currentOrder && (currentOrder.orderDetails.status === "in progress" || currentOrder.orderDetails.status === "completed") && !currentOrder.orderDetails.proName && currentOrder.orderDetails.assignedProId) {
             //console.log(currentOrder)
             fetchProDetails(currentOrder.orderDetails.problemType, currentOrder.orderDetails.assignedProId, currentJobOrderId)
-        }
+        } 
     }, [currentOrder]);
+
+    useEffect(() => {
+        if(currentJobOrderId && !fromCheckout){
+            fetchCurrentJobDetails();
+        }
+    }, [fromCheckout, currentJobOrderId]);
 
     const fetchCurrentJobDetails = async () => {
         try {
             if (!currentOrder) {
+                //console.log('fc', fromCheckout)
                 const dataSnapshot = await firebase.database().ref(`orders/${userId}/${currentJobOrderId}`).once('value');
                 const resData = dataSnapshot.val();
-                dispatch({
-                    type: ADD_ORDER,
-                    orderDetails: resData,
-                    orderId: currentJobOrderId
-                });
+                dispatch(dispatchNewOrder(currentJobOrderId, resData, "map"));
                 setIsFetchingCurrentJobDetails(false);
             }
         } catch (err) {
@@ -126,7 +130,6 @@ const MapScreen = props => {
         if (userId) {
             const dataSnapshot = await firebase.database().ref(`pending_jobs/${userId}/`).once('value');
             const resData = dataSnapshot.val();
-            //console.log(resData);
             if (resData) {
                 dispatch({
                     type: currentJobActions.SET_CURRENT_JOB,

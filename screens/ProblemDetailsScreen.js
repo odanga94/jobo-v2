@@ -15,7 +15,7 @@ import ImagePicker from '../components/ImagePicker';
 import Spinner from '../components/UI/Spinner';
 
 import DefaultStyles from '../constants/default-styles';
-import { fetchAddress } from '../utility/functions';
+import { fetchAddress } from '../shared/functions';
 import {
     PlumbingDetails,
     CleaningDetails,

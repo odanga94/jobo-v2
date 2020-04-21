@@ -20,7 +20,7 @@ import Spinner from './UI/Spinner';
 const { width, height } = Dimensions.get('window');
 
 const OrderSummary = props => {
-    const { orderDetails, date, totalAmount } = props;
+    const { orderDetails, date, totalAmount, problemImage } = props;
     const imagePreviewUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${orderDetails.clientLocation.lat},${orderDetails.clientLocation.lng}&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:%7C${orderDetails.clientLocation.lat},${orderDetails.clientLocation.lng}&key=${ENV.googleApiKey}`;
 
     const formatToSentenceCase = text => text.split("")[0].toUpperCase() + text.slice(1);
@@ -73,6 +73,10 @@ const OrderSummary = props => {
                     }
                     <Text style={styles.description}>Additonal Info:  {orderDetails.optionalInfo}</Text>
                     {
+                        problemImage ?
+                        <View style={styles.problemImageContainer}>
+                            <Image source={{ uri: problemImage }} style={styles.problemImage} />
+                        </View> :
                         orderDetails.problemImage &&
                         <View style={styles.problemImageContainer}>
                             <Image source={{ uri: orderDetails.problemImage }} style={styles.problemImage} />

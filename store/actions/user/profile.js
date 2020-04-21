@@ -1,6 +1,6 @@
 import * as firebase from 'firebase';
 
-import { uploadImage } from '../../../utility/functions';
+import { uploadImage } from '../../../shared/functions';
 
 export const FETCH_PROFILE = "FETCH_PROFILE";
 export const EDIT_PROFILE = "EDIT_PROFILE";

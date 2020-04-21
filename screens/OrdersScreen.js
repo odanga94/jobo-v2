@@ -14,10 +14,10 @@ const OrdersScreen = props => {
     const [error, setError] = useState();
 
     const userId = useSelector(state => state.auth.userId)
-    const orders = useSelector(state => state.orders.orders/*.sort((a, b) => a.orderDetails.dateRequested > b.orderDetails.dateRequested ? -1 : 1)*/);
+    const orders = useSelector(state => state.orders.orders);
     const dispatch = useDispatch();
 
-    const loadOrders = useCallback(async () => {
+    const loadOrders = async () => {
         setError(null);
         //console.log(orders.length)
         if(orders.length === 0){
@@ -30,12 +30,12 @@ const OrdersScreen = props => {
             console.log(err);
         }
         setIsLoading(false);
-    }, [dispatch, setIsLoading, setError, userId]);
+    }
 
 
     useEffect(() => {
         loadOrders();
-    }, [loadOrders]);
+    }, []);
 
     useEffect(() => {
         if(orders.length > 0){
@@ -43,14 +43,6 @@ const OrdersScreen = props => {
         }
     }, [orders])
 
-    /* useEffect(() => {
-        const WillFocusSub = props.navigation.addListener('willFocus', () => {
-            loadOrders();
-        });
-        return () => {
-            WillFocusSub.remove();
-        }
-    }, [loadOrders]); */
 
     if (isLoading) {
         return (

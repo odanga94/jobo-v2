@@ -8,13 +8,17 @@ const initialState = {
 export default (state = initialState, action) => {
     switch (action.type) {
         case ADD_ORDER:
-            return {
-                orders: state.orders.concat(
+            let newOrders = state.orders;
+            if(!state.orders.find(order => order.id === action.orderId)){
+                newOrders = state.orders.concat(
                     new Order(
                         action.orderId,
                         action.orderDetails
                     ),
-                )
+                ); 
+            } 
+            return {
+                orders: newOrders
             }
         case UPDATE_ORDER:
             let indexOfOrderToUpdate;
@@ -49,6 +53,7 @@ export default (state = initialState, action) => {
                 orders: [...state.orders].sort((a,b) => a.orderDetails.dateRequested > b.orderDetails.dateRequested ? -1 : 1)
             }
         }
+        default:
+            return state;
     }
-    return state;
 }

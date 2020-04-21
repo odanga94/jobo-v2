@@ -1,7 +1,8 @@
 import * as firebase from 'firebase';
 
 import Order from '../../models/order';
-import { uploadImage } from '../../utility/functions';
+import { uploadImage } from '../../shared/functions';
+import { billClient } from '../../shared/mpesa';
 import * as currentJobActions from './currentJob';
 
 export const ADD_ORDER = 'ADD_ORDER';
@@ -43,7 +44,6 @@ const getProImageUrl = async (problemType, proId) => {
 
 export const fetchOrders = (userId) => {
     return async (dispatch, getState) => {
-        const existingOrders = getState().orders.orders;
         //const fetchedOrders = [];
         try {
             const dataSnapshot = await firebase.database().ref(`orders/${userId}`).once('value');
@@ -79,72 +79,32 @@ export const fetchOrders = (userId) => {
                     } catch (err) {
                         console.log(err);
                     }
-                    if(!existingOrders.find(order => order.id === fetchedOrders[i].id)){
-                        dispatch({
-                            type: ADD_ORDER,
-                            orderId: fetchedOrders[i].id,
-                            orderDetails: {
+                    dispatch(
+                        dispatchNewOrder(
+                            fetchedOrders[i].id,
+                            {
                                 ...fetchedOrders[i].orderDetails,
                                 proName: proDetails ? `${proDetails.firstName} ${proDetails.lastName}` : "",
                                 proPhone: proDetails ? proDetails.phone : "",
                                 proImage: proImageUrl ? proImageUrl : ""
-                            }
-                        });
-                    }
+                            },
+                            "fetch orders" 
+                        )
+                    );
                     
                 } else {
-                    if(!existingOrders.find(order => order.id === fetchedOrders[i].id)){
-                        dispatch({
-                            type: ADD_ORDER,
-                            orderId: fetchedOrders[i].id,
-                            orderDetails: {
+                    dispatch(
+                        dispatchNewOrder( 
+                            fetchedOrders[i].id,
+                            {
                                 ...fetchedOrders[i].orderDetails,
-                            }
-                        });
-                    }
+                            },
+                            "fetch orders" 
+                        )
+                    );
+
                 }
             }
-            /* let newOrderDetails;
-            for (let orderId in resData) {
-                if (resData[orderId].assignedProId) {
-                    //console.log(resData[orderId].assignedProId, resData[orderId].problemType)
-                    let proDetails = "";
-                    let proImageUrl = "";
-                    try {
-                        proDetails = await getProDetails(resData[orderId].problemType, resData[orderId].assignedProId);
-                        //console.log(proDetails)
-                    } catch (err) {
-                        console.log(err);
-                    }
-                    try {
-                        proImageUrl = await getProImageUrl(resData[orderId].problemType, resData[orderId].assignedProId);
-                        //console.log(proImageUrl)
-                    } catch (err) {
-                        console.log(err);
-                    }
-                    newOrderDetails =
-                    {
-                        ...resData[orderId],
-                        proName: proDetails ? `${proDetails.firstName} ${proDetails.lastName}` : "",
-                        proPhone: proDetails ? proDetails.phone : "",
-                        proImage: proImageUrl ? proImageUrl : ""
-                    }
-                } else {
-                    newOrderDetails =
-                    {
-                        ...resData[orderId]
-                    }
-                }
-                const newOrder = new Order(
-                    orderId,
-                    newOrderDetails
-                )
-                fetchedOrders.push(newOrder);
-            }
-            dispatch({
-                type: SET_ORDERS,
-                orders: fetchedOrders
-            }); */
         } catch (err) {
             console.log(err);
             throw new Error('Something went wrong 😞');
@@ -152,23 +112,27 @@ export const fetchOrders = (userId) => {
     }
 }
 
-export const addOrder = (userId, orderDetails, imageUri) => {
+export const dispatchNewOrder = (orderId, orderDetails, from) => {
+        return {
+            type: ADD_ORDER,
+            orderDetails,
+            orderId
+        };
+}
+
+export const addOrder = (userId, orderDetails, imageUri, paymentType) => {
     return async (dispatch, getState) => {
         let orderId;
-        const existingOrders = getState().orders.orders;
         try {
             const orderRef = await firebase.database().ref(`orders/${userId}`).push(orderDetails);
             const orderRefArray = orderRef.toString().split('/');
             orderId = orderRefArray[orderRefArray.length - 1];
             //console.log('[ORDER_ID]', orderId);
-            await dispatch(currentJobActions.addCurrentJob(orderId));
-            if (!existingOrders.find(order => order.id === orderId)) {
-                dispatch({
-                    type: ADD_ORDER,
-                    orderDetails,
-                    orderId
-                });
+            if(paymentType === "mpesa"){
+                await billClient(userId, orderId);
             }
+            /*await dispatch(currentJobActions.addCurrentJob(orderId));*/
+            dispatch(dispatchNewOrder(orderId, orderDetails, "checkout"));
         } catch (err) {
             console.log(err);
             throw new Error('Something went wrong 😞');
@@ -177,6 +141,12 @@ export const addOrder = (userId, orderDetails, imageUri) => {
             try {
                 const firebaseImageUri = await uploadImage(imageUri, `images/${userId}/orders/${orderId}/problemImage.jpg`);
                 await firebase.database().ref(`orders/${userId}/${orderId}`).update({ problemImage: firebaseImageUri });
+                dispatch({
+                    type: UPDATE_ORDER,
+                    valueToUpdate: "problemImage",
+                    value: firebaseImageUri,
+                    orderId
+                });
             } catch (err) {
                 throw new Error('Error uploading image but your order was successful.');
             }
