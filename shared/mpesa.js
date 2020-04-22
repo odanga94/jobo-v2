@@ -18,7 +18,7 @@ const getMpesaAccessToken = async () => {
         return jsonResponse.access_token;
     } catch (err) {
         console.log(err);
-        throw new Error(err);
+        throw new Error("mpesaConfigError");
     }
 }
 
@@ -61,9 +61,12 @@ export const billClient = async (userId, orderId) => {
         });
         const jsonResponse = await response.json();
         console.log('res', jsonResponse);
+        if(jsonResponse.errorMessage){
+            throw new Error(jsonResponse);
+        }
     } catch (err) {
         console.log(err);
-        throw new Error(err);
+        throw new Error("mpesaConfigError");
     }
 }
 

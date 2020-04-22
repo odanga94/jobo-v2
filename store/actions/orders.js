@@ -9,6 +9,8 @@ export const ADD_ORDER = 'ADD_ORDER';
 export const UPDATE_ORDER = 'UPDATE_ORDER';
 export const SET_ORDERS = 'SET_ORDERS';
 export const SORT_ORDERS = 'SORT_ORDERS';
+export const SET_ORDER_ID_BEING_PROCESSED = 'SET_ORDER_ID_BEING_PROCESSED';
+export const RESET_ORDER_ID_BEING_PROCESSED = 'RESET_ORDER_ID_BEING_PROCESSED';
 
 const getProDetails = async (problemType, proId) => {
     const dataSnapshot = await firebase.database().ref(`pros/${problemType}/${proId}`).once('value');
@@ -121,7 +123,7 @@ export const dispatchNewOrder = (orderId, orderDetails, from) => {
 }
 
 export const addOrder = (userId, orderDetails, imageUri, paymentType) => {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         let orderId;
         try {
             const orderRef = await firebase.database().ref(`orders/${userId}`).push(orderDetails);
@@ -131,11 +133,17 @@ export const addOrder = (userId, orderDetails, imageUri, paymentType) => {
             if(paymentType === "mpesa"){
                 await billClient(userId, orderId);
             }
-            /*await dispatch(currentJobActions.addCurrentJob(orderId));*/
             dispatch(dispatchNewOrder(orderId, orderDetails, "checkout"));
+            dispatch({
+                type: SET_ORDER_ID_BEING_PROCESSED,
+                orderId
+            });
         } catch (err) {
             console.log(err);
-            throw new Error('Something went wrong 😞');
+            if(err.message = "mpesaConfigError"){
+                await firebase.database().ref(`orders/${userId}/${orderId}`).remove();
+            }
+            throw new Error('Something went wrong 😞.  Please try again later.');
         }
         if (imageUri) {
             try {

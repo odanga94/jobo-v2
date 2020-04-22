@@ -1,8 +1,16 @@
 import Order from '../../models/order';
-import { ADD_ORDER, SET_ORDERS, UPDATE_ORDER, SORT_ORDERS } from '../actions/orders';
+import { 
+    ADD_ORDER, 
+    SET_ORDERS, 
+    UPDATE_ORDER, 
+    SORT_ORDERS,
+    SET_ORDER_ID_BEING_PROCESSED,
+    RESET_ORDER_ID_BEING_PROCESSED 
+} from '../actions/orders';
 
 const initialState = {
-    orders: []
+    orders: [],
+    orderIdBeingProcessed: null
 }
 
 export default (state = initialState, action) => {
@@ -18,6 +26,7 @@ export default (state = initialState, action) => {
                 ); 
             } 
             return {
+                ...state,
                 orders: newOrders
             }
         case UPDATE_ORDER:
@@ -41,6 +50,7 @@ export default (state = initialState, action) => {
             const updatedOrders = [...state.orders];
             updatedOrders.splice(indexOfOrderToUpdate, 1, updatedOrder);
             return {
+                ...state,
                 orders: updatedOrders
             }
         case SET_ORDERS:
@@ -50,9 +60,20 @@ export default (state = initialState, action) => {
             }
         case SORT_ORDERS:{
             return {
+                ...state,
                 orders: [...state.orders].sort((a,b) => a.orderDetails.dateRequested > b.orderDetails.dateRequested ? -1 : 1)
             }
         }
+        case SET_ORDER_ID_BEING_PROCESSED:
+            return {
+                ...state,
+                orderIdBeingProcessed: action.orderId
+            }
+        case RESET_ORDER_ID_BEING_PROCESSED:
+            return {
+                ...state,
+                orderIdBeingProcessed: null
+            }
         default:
             return state;
     }

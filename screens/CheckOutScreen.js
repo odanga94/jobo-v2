@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import moment from 'moment';
 import {
     View,
@@ -8,13 +8,12 @@ import {
     Dimensions,
     TouchableOpacity,
     Image,
-    Modal,
-    TouchableWithoutFeedback
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
 import * as firebase from 'firebase';
 
+import Modal from '../components/UI/Modal';
 import MainButton from '../components/UI/MainButton';
 import Spinner from '../components/UI/Spinner';
 import OrderSummary from '../components/OrderSummary';
@@ -29,7 +28,7 @@ const { width } = Dimensions.get('window');
 const CheckOutScreen = props => {
     const dispatch = useDispatch();
     const userId = useSelector(state => state.auth.userId);
-    const orders = useSelector(state => state.orders.orders);
+    const orderIdBeingProcessed = useSelector(state => state.orders.orderIdBeingProcessed);
 
     const { navigation } = props;
     const orderDetails = navigation.getParam('orderDetails');
@@ -39,25 +38,44 @@ const CheckOutScreen = props => {
     const [addOrderLoading, setAddOrderLoading] = useState(false);
     const [addOrderError, setAddOrderError] = useState();
     const [transactionSuccess, setTransactionSuccess] = useState(false);
+    const [transactionError, setTransactionError] = useState(false);
 
     useEffect(() => {
-        const paymentRef = firebase.database().ref(`payments/${userId}`);
-        const handleChildAdded = async (dataSnapshot) => {
-            //console.log('orderId', dataSnapshot.key);
-            if (dataSnapshot.key === orders[0].id) {
-                dispatch({
-                    type: currentJobActions.SET_CURRENT_JOB,
-                    currentJobOrderId: dataSnapshot.key
-                });
+        const paymentRef = firebase.database().ref(`payments/${userId}/${orderIdBeingProcessed}`);
+        const handleChildAdded = (dataSnapshot) => {
+                const dataWritten = dataSnapshot.val();
+                //console.log('data', dataWritten);
+                if (dataWritten.Body.stkCallback.ResultCode === 0) {
+                    dispatch({
+                        type: currentJobActions.SET_CURRENT_JOB,
+                        currentJobOrderId: orderIdBeingProcessed
+                    });
+                    dispatch({
+                        type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
+                    });
+                    setTransactionSuccess(true);
+                } else {
+                    setTransactionError(true);
+                    dispatch({
+                        type: orderActions.UPDATE_ORDER,
+                        orderId: orderIdBeingProcessed,
+                        valueToUpdate: "status",
+                        value: "cancelled"
+                    });
+                    dispatch({
+                        type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
+                    });
+                }
                 setAddOrderLoading(false);
-                setTransactionSuccess(true);
-            }
+
         }
-        if (userId && orders.length > 0) {
+
+        if (userId && orderIdBeingProcessed) {
             paymentRef.on("child_added", handleChildAdded);
         }
+
         return () => paymentRef.off("child_added", handleChildAdded);
-    }, [userId, orders]);
+    }, [userId, orderIdBeingProcessed]);
 
     useEffect(() => {
         let goToMap;
@@ -112,30 +130,34 @@ const CheckOutScreen = props => {
 
     if (transactionSuccess) {
         return (
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={transactionSuccess}
-                onRequestClose={() => {
-                    console.log('Modal has been closed.');
-                }}
-            >
-                <TouchableWithoutFeedback onPress={navigateToMap} >
-                    <View style={styles.bigContainer}>
-                        <TouchableWithoutFeedback>
-                            <View style={styles.successContainer}>
-                                <Text style={{ ...DefaultStyles.titleText, textAlign: "center" }}>Payment of KES. 200 Successful!</Text>
-                                <Image source={require('../assets/success-tick.png')} style={{ width: 150, height: 150, marginVertical: 15 }} />
-                                <MainButton
-                                    style={{ marginTop: 20 }}
-                                    onPress={() => {
-                                        navigateToMap();
-                                    }}
-                                >Okay</MainButton>
-                            </View>
-                        </TouchableWithoutFeedback>
-                    </View>
-                </TouchableWithoutFeedback>
+            <Modal visible={transactionSuccess} pressed={navigateToMap}>
+                <View style={styles.successContainer}>
+                    <Text style={{ ...DefaultStyles.titleText, textAlign: "center" }}>Payment of KES. 200 Successful!</Text>
+                    <Image source={require('../assets/success-tick.png')} style={{ width: 150, height: 150, marginVertical: 15 }} />
+                    <MainButton
+                        style={{ marginTop: 20 }}
+                        onPress={() => {
+                            navigateToMap();
+                        }}
+                    >Okay</MainButton>
+                </View>
+            </Modal>
+        );
+    }
+
+    if (transactionError) {
+        return (
+            <Modal visible={transactionError} pressed={() => { setTransactionError(false) }}>
+                <View style={styles.successContainer}>
+                    <Text style={{ ...DefaultStyles.titleText, textAlign: "center" }}>Payment was unsuccessful. Your order has been cancelled 😔</Text>
+                    <Image source={require('../assets/error.png')} style={{ width: 150, height: 150, marginVertical: 15 }} />
+                    <MainButton
+                        style={{ marginTop: 20 }}
+                        onPress={() => {
+                            setTransactionError(false);
+                        }}
+                    >Okay</MainButton>
+                </View>
             </Modal>
         );
     }
@@ -198,12 +220,6 @@ const CheckOutScreen = props => {
 };
 
 const styles = StyleSheet.create({
-    bigContainer: {
-        flex: 1,
-        backgroundColor: "rgba(0,0,0,0.8)",
-        alignItems: "center",
-        justifyContent: "center"
-    },
     container: {
         flex: 1,
         alignItems: "center",
@@ -215,7 +231,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         padding: 20,
-        backgroundColor: "white"
+        backgroundColor: "white",
+        width: "85%"
     },
     paymentContainer: {
         flexDirection: "row",

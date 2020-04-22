@@ -31,14 +31,14 @@ const OrderItem = props => {
                 <View style={styles.proInfoContainer}>
                     <View style={styles.imageContainer}>
                         {
-                            orderDetails.status === "pending" ? 
+                            orderDetails.status === "pending" || orderDetails.status === "cancelled" ? 
                             <Image source={require('../assets/pro-icon.png')} style={styles.image} /> :
                             <Image source={{ uri: orderDetails.proImage }} style={styles.image} /*resizeMode='contain'*/ />
                         }    
                     </View>
                     <View>
                         {
-                            orderDetails.status === "pending" ?
+                            orderDetails.status === "pending" || orderDetails.status === "cancelled" ?
                             <Text style={{ ...styles.title, color: "#505050" }}><Text style={styles.date}>Pro unassigned </Text></Text> :
                             <Text style={{ ...styles.title, color: "#505050" }}><Text style={styles.date}>Pro Name: </Text>{orderDetails.proName}</Text> 
                         }
@@ -49,9 +49,9 @@ const OrderItem = props => {
                 <View style={{ /*height: '20%',*/ marginBottom: 10 }}>
                     <View style={styles.details}>
                         <Text style={styles.title}>{formatToSentenceCase(orderDetails.problemType)}</Text>
-                        <Text style={styles.price}>KES.{props.price.toFixed(2)}</Text>
+                        <Text style={styles.price}>KES. {orderDetails.status === "cancelled" ? Number(0).toFixed(2) : props.price.toFixed(2)}</Text>
                     </View>
-                    <Text style={DefaultStyles.bodyText}>status:  <Text style={{color: Colors.secondary}}>{formatToSentenceCase(orderDetails.status)}</Text></Text>
+                    <Text style={DefaultStyles.bodyText}>status:  <Text style={{color: orderDetails.status === "cancelled" ? "red" : Colors.secondary}}>{formatToSentenceCase(orderDetails.status)}</Text></Text>
                 </View>
                 <View style={styles.actions} >
                     <MainButton onPress={props.onViewDetail} style={{ paddingHorizontal: 12.5, paddingVertical: 5 }}>

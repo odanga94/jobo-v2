@@ -34,7 +34,7 @@ const OrderSummary = props => {
                     <View style={styles.datePriceContainer}>
                         <Text style={styles.datePrice}>{date}</Text>
                     </View>
-                    <Text style={styles.title}>status: <Text style={{ fontFamily: 'poppins-bold', color: Colors.secondary }}>{formatToSentenceCase(orderDetails.status)}</Text></Text>
+                    <Text style={styles.title}>status: <Text style={{ fontFamily: 'poppins-bold', color: orderDetails.status === "cancelled" ? "red" : Colors.secondary}}>{formatToSentenceCase(orderDetails.status)}</Text></Text>
                 </View>
                 <View style={{ marginVertical: 10 }}>
                     <Text style={styles.title}>You requested for <Text style={{ fontFamily: 'poppins-bold' }}>{formatToSentenceCase(orderDetails.problemType)}</Text> service.</Text>
@@ -126,8 +126,9 @@ const OrderSummary = props => {
                         }
                     </Card>
                 }
-                <Text style={{ ...styles.title, marginVertical: 15 }}>Connection Fee: <Text style={{ fontFamily: 'poppins-bold' }}>KES.{totalAmount.toFixed(2)}</Text></Text>
-
+                {
+                    orderDetails.status !== "cancelled" && <Text style={{ ...styles.title, marginVertical: 15 }}>Connection Fee: <Text style={{ fontFamily: 'poppins-bold' }}>KES.{totalAmount.toFixed(2)}</Text></Text>
+                }
             </View>
         </Fragment>
     );
