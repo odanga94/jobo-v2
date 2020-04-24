@@ -5,7 +5,9 @@ import {
     StyleSheet,
     ScrollView,
     TextInput,
-    Dimensions
+    Dimensions,
+    KeyboardAvoidingView,
+    Alert
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -30,7 +32,8 @@ import {
     TaxDetails,
     CarpenterDetails
 } from '../data/problem-details';
-import * as orderActions from '../store/actions/orders';
+import * as profileActions from '../store/actions/user/profile';
+import colors from '../constants/colors';
 
 
 const { width } = Dimensions.get('window');
@@ -38,6 +41,7 @@ const { width } = Dimensions.get('window');
 const ProblemDetailsScreen = props => {
     const { navigation } = props;
     const userId = useSelector(state => state.auth.userId);
+    const phoneNumber = useSelector(state => state.profile.phone)
 
     const proId = navigation.getParam('proId');
     const pickedLocationAddress = navigation.getParam('pickedLocationAddress');
@@ -57,12 +61,20 @@ const ProblemDetailsScreen = props => {
     const [optionalInfo, setOptionalInfo] = useState('');
     const [problemImage, setProblemImage] = useState();
     const [clientLocation, setClientLocation] = useState(useSelector(state => state.location.userLocation));
+    const [clientPhone, setClientPhone] = useState(phoneNumber);
 
     const [serviceDetails, setServiceDetails] = useState({});
     const [addOrderLoading, setAddOrderLoading] = useState(false);
     const [addOrderError, setAddOrderError] = useState();
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (!phoneNumber && userId) {
+            dispatch(profileActions.fetchProfile(userId));
+        }
+        setClientPhone(phoneNumber);
+    }, [phoneNumber, userId]);
 
     useEffect(() => {
         switch (proId) {
@@ -170,9 +182,15 @@ const ProblemDetailsScreen = props => {
             dateRequested: new Date().toISOString(),
             status: "pending"
         }
+        if (!clientPhone.trim()){
+            Alert.alert('Wrong Input!', 'Please enter a valid phone number to contact you on.', [{ text: 'Okay' }]);
+            return;
+        }
         navigation.navigate('Check Out', {
             orderDetails,
-            problemImage
+            problemImage,
+            clientPhone,
+            initiallyHadPhoneNo: phoneNumber ? true : false
         });
     }
 
@@ -234,182 +252,196 @@ const ProblemDetailsScreen = props => {
     }
 
     return (
-        <ScrollView contentContainerStyle={styles.screen}>
-            <Fragment>
-                {
-                    serviceDetails.problemField &&
+        <View style={{ padding: 10, backgroundColor: "white", flex: 1 }}>
+            <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={150} style={{ flex: 1 }}>
+                <ScrollView contentContainerStyle={styles.screen}>
                     <Fragment>
-                        <Text style={DefaultStyles.bodyText}>{serviceDetails.problemField.fieldName}</Text>
-                        <ListButton
-                            info={renderProblemInfo ? renderProblemInfo : "Select all that apply"}
-                            pressedHandler={() => {
-                                navigation.navigate('ListItems', {
-                                    items: serviceDetails.problemField.items,
-                                    type: 'problems',
-                                    alreadySelected: problems
-                                })
-                            }}
-                        />
+                        {
+                            serviceDetails.problemField &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>{serviceDetails.problemField.fieldName}</Text>
+                                <ListButton
+                                    info={renderProblemInfo ? renderProblemInfo : "Select all that apply"}
+                                    pressedHandler={() => {
+                                        navigation.navigate('ListItems', {
+                                            items: serviceDetails.problemField.items,
+                                            type: 'problems',
+                                            alreadySelected: problems
+                                        })
+                                    }}
+                                />
+                            </Fragment>
+                        }
+                        {
+                            serviceDetails.partThatNeedsWorkField &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>{serviceDetails.partThatNeedsWorkField.fieldName}</Text>
+                                <ListButton
+                                    info={renderPartsthatNeedsWork ? renderPartsthatNeedsWork : "Select all that apply"}
+                                    pressedHandler={() => {
+                                        navigation.navigate('ListItems', {
+                                            items: serviceDetails.partThatNeedsWorkField.items,
+                                            type: 'plumbingParts',
+                                            alreadySelected: partsthatNeedWork
+                                        })
+                                    }}
+                                />
+                            </Fragment>
+                        }
+                        {
+                            serviceDetails.buildingType &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>{serviceDetails.buildingType.fieldName}</Text>
+                                <ListButton
+                                    info={renderBuildingType ? renderBuildingType : !serviceDetails.buildingType.manySelectable ? "Select all that apply" : "Select one"}
+                                    pressedHandler={() => {
+                                        navigation.navigate('ListItems', {
+                                            items: serviceDetails.buildingType.items,
+                                            type: 'buildingType',
+                                            alreadySelected: buildingType,
+                                            manySelectable: serviceDetails.buildingType.manySelectable
+                                        })
+                                    }}
+                                />
+                            </Fragment>
+                        }
+                        {
+                            serviceDetails.roomThatNeedsWorkField &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>{serviceDetails.roomThatNeedsWorkField.fieldName}</Text>
+                                <ListButton
+                                    info={renderRoomsThatNeedWork ? renderRoomsThatNeedWork : !serviceDetails.roomThatNeedsWorkField.manySelectable ? "Select all that apply" : "Select one"}
+                                    pressedHandler={() => {
+                                        navigation.navigate('ListItems', {
+                                            items: serviceDetails.roomThatNeedsWorkField.items,
+                                            type: 'rooms',
+                                            alreadySelected: roomsThatNeedWork,
+                                            manySelectable: serviceDetails.roomThatNeedsWorkField.manySelectable
+                                        })
+                                    }}
+                                />
+                            </Fragment>
+                        }
+                        {
+                            serviceDetails.bucketsOfClothes &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>{serviceDetails.bucketsOfClothes.fieldName}</Text>
+                                <ListButton
+                                    info={renderBucketsOfClothes ? renderBucketsOfClothes : !serviceDetails.bucketsOfClothes.manySelectable ? "Select all that apply" : "Select one"}
+                                    pressedHandler={() => {
+                                        navigation.navigate('ListItems', {
+                                            items: serviceDetails.bucketsOfClothes.items,
+                                            type: 'bucketsOfClothes',
+                                            alreadySelected: bucketsOfClothes,
+                                            manySelectable: serviceDetails.bucketsOfClothes.manySelectable
+                                        })
+                                    }}
+                                />
+                            </Fragment>
+                        }
+                        {
+                            serviceDetails.mealDescription &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>Describe the meal you would like cooked</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="name of meal, how you want it cooked etc."
+                                    multiline={true}
+                                    numberOfLines={5}
+                                    onChangeText={setMealDescription}
+                                    value={mealDescription}
+                                />
+                            </Fragment>
+                        }
+                        {
+                            serviceDetails.equipmentNeeded &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>{serviceDetails.equipmentNeeded.fieldName}</Text>
+                                <ListButton
+                                    info={renderEquipmentNeeded ? renderEquipmentNeeded : !serviceDetails.equipmentNeeded.manySelectable ? "Select all that apply" : "Select one"}
+                                    pressedHandler={() => {
+                                        navigation.navigate('ListItems', {
+                                            items: serviceDetails.equipmentNeeded.items,
+                                            type: 'equipmentNeeded',
+                                            alreadySelected: equipmentNeeded,
+                                            manySelectable: serviceDetails.equipmentNeeded.manySelectable
+                                        })
+                                    }}
+                                />
+                            </Fragment>
+                        }
+                        {
+                            serviceDetails.numberOfPeople &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>{serviceDetails.numberOfPeople.fieldName}</Text>
+                                <ListButton
+                                    info={renderNoOfPeople ? renderNoOfPeople : !serviceDetails.numberOfPeople.manySelectable ? "Select all that apply" : "Select one"}
+                                    pressedHandler={() => {
+                                        navigation.navigate('ListItems', {
+                                            items: serviceDetails.numberOfPeople.items,
+                                            type: 'numberOfPeople',
+                                            alreadySelected: numberOfPeople,
+                                            manySelectable: serviceDetails.numberOfPeople.manySelectable
+                                        })
+                                    }}
+                                />
+                            </Fragment>
+                        }
+                        {
+                            serviceDetails.optionalInfoField &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>Anything else the pro should be aware of ?</Text>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="optional"
+                                    multiline={true}
+                                    numberOfLines={5}
+                                    onChangeText={setOptionalInfo}
+                                    value={optionalInfo}
+                                />
+                            </Fragment>
+                        }
+                        {
+                            serviceDetails.needsPicture &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>Would you like to add a photo to better desribe your problem ?</Text>
+                                <ImagePicker
+                                    setImage={setProblemImage}
+                                    imageUri={problemImage}
+                                />
+                            </Fragment>
+                        }
+                        <Text style={DefaultStyles.bodyText}>Location :</Text>
+                        <ListButton info={clientAddress} pressedHandler={goToLocation} />
+                        <Fragment>
+                            <Text style={DefaultStyles.bodyText}>Phone number to contact you on :</Text>
+                            <TextInput
+                                style={{ ...styles.input, color: colors.secondary }}
+                                placeholder=""
+                                onChangeText={(text) => { setClientPhone(text) }}
+                                value={clientPhone}
+                                keyboardType="number-pad"
+                            />
+                        </Fragment>
                     </Fragment>
-                }
-                {
-                    serviceDetails.partThatNeedsWorkField &&
-                    <Fragment>
-                        <Text style={DefaultStyles.bodyText}>{serviceDetails.partThatNeedsWorkField.fieldName}</Text>
-                        <ListButton
-                            info={renderPartsthatNeedsWork ? renderPartsthatNeedsWork : "Select all that apply"}
-                            pressedHandler={() => {
-                                navigation.navigate('ListItems', {
-                                    items: serviceDetails.partThatNeedsWorkField.items,
-                                    type: 'plumbingParts',
-                                    alreadySelected: partsthatNeedWork
-                                })
-                            }}
-                        />
-                    </Fragment>
-                }
-                {
-                    serviceDetails.buildingType &&
-                    <Fragment>
-                        <Text style={DefaultStyles.bodyText}>{serviceDetails.buildingType.fieldName}</Text>
-                        <ListButton
-                            info={renderBuildingType ? renderBuildingType : !serviceDetails.buildingType.manySelectable ? "Select all that apply" : "Select one"}
-                            pressedHandler={() => {
-                                navigation.navigate('ListItems', {
-                                    items: serviceDetails.buildingType.items,
-                                    type: 'buildingType',
-                                    alreadySelected: buildingType,
-                                    manySelectable: serviceDetails.buildingType.manySelectable
-                                })
-                            }}
-                        />
-                    </Fragment>
-                }
-                {
-                    serviceDetails.roomThatNeedsWorkField &&
-                    <Fragment>
-                        <Text style={DefaultStyles.bodyText}>{serviceDetails.roomThatNeedsWorkField.fieldName}</Text>
-                        <ListButton
-                            info={renderRoomsThatNeedWork ? renderRoomsThatNeedWork : !serviceDetails.roomThatNeedsWorkField.manySelectable ? "Select all that apply" : "Select one"}
-                            pressedHandler={() => {
-                                navigation.navigate('ListItems', {
-                                    items: serviceDetails.roomThatNeedsWorkField.items,
-                                    type: 'rooms',
-                                    alreadySelected: roomsThatNeedWork,
-                                    manySelectable: serviceDetails.roomThatNeedsWorkField.manySelectable
-                                })
-                            }}
-                        />
-                    </Fragment>
-                }
-                {
-                    serviceDetails.bucketsOfClothes &&
-                    <Fragment>
-                        <Text style={DefaultStyles.bodyText}>{serviceDetails.bucketsOfClothes.fieldName}</Text>
-                        <ListButton
-                            info={renderBucketsOfClothes ? renderBucketsOfClothes : !serviceDetails.bucketsOfClothes.manySelectable ? "Select all that apply" : "Select one"}
-                            pressedHandler={() => {
-                                navigation.navigate('ListItems', {
-                                    items: serviceDetails.bucketsOfClothes.items,
-                                    type: 'bucketsOfClothes',
-                                    alreadySelected: bucketsOfClothes,
-                                    manySelectable: serviceDetails.bucketsOfClothes.manySelectable
-                                })
-                            }}
-                        />
-                    </Fragment>
-                }
-                {
-                    serviceDetails.mealDescription &&
-                    <Fragment>
-                        <Text style={DefaultStyles.bodyText}>Describe the meal you would like cooked</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="name of meal, how you want it cooked etc."
-                            multiline={true}
-                            numberOfLines={5}
-                            onChangeText={setMealDescription}
-                            value={mealDescription}
-                        />
-                    </Fragment>
-                }
-                {
-                    serviceDetails.equipmentNeeded &&
-                    <Fragment>
-                        <Text style={DefaultStyles.bodyText}>{serviceDetails.equipmentNeeded.fieldName}</Text>
-                        <ListButton
-                            info={renderEquipmentNeeded ? renderEquipmentNeeded : !serviceDetails.equipmentNeeded.manySelectable ? "Select all that apply" : "Select one"}
-                            pressedHandler={() => {
-                                navigation.navigate('ListItems', {
-                                    items: serviceDetails.equipmentNeeded.items,
-                                    type: 'equipmentNeeded',
-                                    alreadySelected: equipmentNeeded,
-                                    manySelectable: serviceDetails.equipmentNeeded.manySelectable
-                                })
-                            }}
-                        />
-                    </Fragment>
-                }
-                {
-                    serviceDetails.numberOfPeople &&
-                    <Fragment>
-                        <Text style={DefaultStyles.bodyText}>{serviceDetails.numberOfPeople.fieldName}</Text>
-                        <ListButton
-                            info={renderNoOfPeople ? renderNoOfPeople : !serviceDetails.numberOfPeople.manySelectable ? "Select all that apply" : "Select one"}
-                            pressedHandler={() => {
-                                navigation.navigate('ListItems', {
-                                    items: serviceDetails.numberOfPeople.items,
-                                    type: 'numberOfPeople',
-                                    alreadySelected: numberOfPeople,
-                                    manySelectable: serviceDetails.numberOfPeople.manySelectable
-                                })
-                            }}
-                        />
-                    </Fragment>
-                }
-                {
-                    serviceDetails.optionalInfoField &&
-                    <Fragment>
-                        <Text style={DefaultStyles.bodyText}>Anything else the pro should be aware of ?</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="optional"
-                            multiline={true}
-                            numberOfLines={5}
-                            onChangeText={setOptionalInfo}
-                            value={optionalInfo}
-                        />
-                    </Fragment>
-                }
-                {
-                    serviceDetails.needsPicture &&
-                    <Fragment>
-                        <Text style={DefaultStyles.bodyText}>Would you like to add a photo to better desribe your problem ?</Text>
-                        <ImagePicker
-                            setImage={setProblemImage}
-                            imageUri={problemImage}
-                        />
-                    </Fragment>
-                }
-                <Text style={DefaultStyles.bodyText}>Location:</Text>
-                <ListButton info={clientAddress} pressedHandler={goToLocation} />
-                <View style={styles.buttonContainer}>
-                    <MainButton
-                        style={{ backgroundColor: "red", width: width / 2.3, height: 50 }}
-                        onPress={() => {
-                            navigation.navigate({ routeName: 'Map' });
-                        }}
-                    >Cancel</MainButton>
-                    <MainButton
-                        style={{ width: width / 2.3, height: 50 }}
-                        onPress={() => {
-                            goToCheckOut();
-                        }}
-                    >Check Out</MainButton>
-                </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
+            <View style={styles.buttonContainer}>
+                <MainButton
+                    style={{ backgroundColor: "red", width: width / 2.3, height: 50 }}
+                    onPress={() => {
+                        navigation.navigate({ routeName: 'Map' });
+                    }}
+                >Cancel</MainButton>
+                <MainButton
+                    style={{ width: width / 2.3, height: 50 }}
+                    onPress={() => {
+                        goToCheckOut();
+                    }}
+                >Check Out</MainButton>
+            </View>
+        </View>
 
-            </Fragment>
-        </ScrollView>
     );
 };
 
@@ -430,9 +462,7 @@ const styles = StyleSheet.create({
     },
     screen: {
         width: '100%',
-        backgroundColor: 'white',
-        padding: 10,
-        justifyContent: 'center'
+        justifyContent: 'center',
     },
     input: {
         paddingHorizontal: 2,

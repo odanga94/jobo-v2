@@ -9,6 +9,8 @@ export const ADD_ORDER = 'ADD_ORDER';
 export const UPDATE_ORDER = 'UPDATE_ORDER';
 export const SET_ORDERS = 'SET_ORDERS';
 export const SORT_ORDERS = 'SORT_ORDERS';
+export const REMOVE_ORDER = 'REMOVE_ORDER';
+export const RESET_ORDERS = 'RESET_ORDERS';
 export const SET_ORDER_ID_BEING_PROCESSED = 'SET_ORDER_ID_BEING_PROCESSED';
 export const RESET_ORDER_ID_BEING_PROCESSED = 'RESET_ORDER_ID_BEING_PROCESSED';
 
@@ -122,7 +124,7 @@ export const dispatchNewOrder = (orderId, orderDetails, from) => {
         };
 }
 
-export const addOrder = (userId, orderDetails, imageUri, paymentType) => {
+export const addOrder = (userId, orderDetails, imageUri, paymentType, clientPhone) => {
     return async (dispatch) => {
         let orderId;
         try {
@@ -131,7 +133,7 @@ export const addOrder = (userId, orderDetails, imageUri, paymentType) => {
             orderId = orderRefArray[orderRefArray.length - 1];
             //console.log('[ORDER_ID]', orderId);
             if(paymentType === "mpesa"){
-                await billClient(userId, orderId);
+                await billClient(userId, orderId, clientPhone);
             }
             dispatch(dispatchNewOrder(orderId, orderDetails, "checkout"));
             dispatch({
@@ -142,6 +144,10 @@ export const addOrder = (userId, orderDetails, imageUri, paymentType) => {
             console.log(err);
             if(err.message = "mpesaConfigError"){
                 await firebase.database().ref(`orders/${userId}/${orderId}`).remove();
+                dispatch({
+                    type: REMOVE_ORDER,
+                    orderId
+                });
             }
             throw new Error('Something went wrong 😞.  Please try again later.');
         }

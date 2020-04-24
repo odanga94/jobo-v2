@@ -21,6 +21,7 @@ import DefaultStyles from '../constants/default-styles';
 import Colors from '../constants/colors';
 
 import * as orderActions from '../store/actions/orders';
+import * as profileActions from '../store/actions/user/profile';
 import * as currentJobActions from '../store/actions/currentJob';
 
 const { width } = Dimensions.get('window');
@@ -29,49 +30,55 @@ const CheckOutScreen = props => {
     const dispatch = useDispatch();
     const userId = useSelector(state => state.auth.userId);
     const orderIdBeingProcessed = useSelector(state => state.orders.orderIdBeingProcessed);
+    const userName = useSelector(state => state.profile.name)
 
     const { navigation } = props;
     const orderDetails = navigation.getParam('orderDetails');
     const problemImage = navigation.getParam('problemImage');
-
+    const clientPhone = navigation.getParam('clientPhone');
 
     const [addOrderLoading, setAddOrderLoading] = useState(false);
     const [addOrderError, setAddOrderError] = useState();
     const [transactionSuccess, setTransactionSuccess] = useState(false);
     const [transactionError, setTransactionError] = useState(false);
+    const [paymentType, setPaymentType] = useState("mpesa");
 
     useEffect(() => {
         const paymentRef = firebase.database().ref(`payments/${userId}/${orderIdBeingProcessed}`);
         const handleChildAdded = (dataSnapshot) => {
-                const dataWritten = dataSnapshot.val();
-                //console.log('data', dataWritten);
-                if (dataWritten.Body.stkCallback.ResultCode === 0) {
-                    dispatch({
-                        type: currentJobActions.SET_CURRENT_JOB,
-                        currentJobOrderId: orderIdBeingProcessed
-                    });
-                    dispatch({
-                        type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
-                    });
-                    setTransactionSuccess(true);
-                } else {
-                    setTransactionError(true);
-                    dispatch({
-                        type: orderActions.UPDATE_ORDER,
-                        orderId: orderIdBeingProcessed,
-                        valueToUpdate: "status",
-                        value: "cancelled"
-                    });
-                    dispatch({
-                        type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
-                    });
-                }
-                setAddOrderLoading(false);
+            const dataWritten = dataSnapshot.val();
+            //console.log('data', dataWritten);
+            if (dataWritten.Body.stkCallback.ResultCode === 0) {
+                dispatch({
+                    type: currentJobActions.SET_CURRENT_JOB,
+                    currentJobOrderId: orderIdBeingProcessed
+                });
+                dispatch({
+                    type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
+                });
+                setTransactionSuccess(true);
+            } else {
+                setTransactionError(true);
+                dispatch({
+                    type: orderActions.UPDATE_ORDER,
+                    orderId: orderIdBeingProcessed,
+                    valueToUpdate: "status",
+                    value: "cancelled"
+                });
+                dispatch({
+                    type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
+                });
+            }
+            setAddOrderLoading(false);
 
         }
 
         if (userId && orderIdBeingProcessed) {
-            paymentRef.on("child_added", handleChildAdded);
+            if (paymentType === "mpesa") {
+                paymentRef.on("child_added", handleChildAdded);
+            } else {
+                processCardOrder();
+            }
         }
 
         return () => paymentRef.off("child_added", handleChildAdded);
@@ -88,11 +95,21 @@ const CheckOutScreen = props => {
         return () => clearTimeout(goToMap);
     }, [transactionSuccess])
 
-    const addOrder = async (paymentType) => {
+    const addOrder = async (type) => {
         setAddOrderError(null);
         setAddOrderLoading(true);
+        setPaymentType(type);
         try {
-            await dispatch(orderActions.addOrder(userId, orderDetails, problemImage, paymentType));
+            if (!navigation.getParam('initiallyHadPhoneNo')) {
+                dispatch(profileActions.editProfile(
+                    userId,
+                    {
+                        name: userName,
+                        phone: clientPhone
+                    }
+                ));
+            }
+            await dispatch(orderActions.addOrder(userId, orderDetails, problemImage, type, clientPhone));
             dispatch({
                 type: orderActions.SORT_ORDERS
             });
@@ -100,6 +117,24 @@ const CheckOutScreen = props => {
             setAddOrderError(err.message);
             setAddOrderLoading(false);
         }
+    }
+
+    const processCardOrder = async () => {
+        try {
+            await firebase.database().ref(`pending_jobs/${userId}`)
+                .set({ currentJobOrderId: orderIdBeingProcessed });
+            dispatch({
+                type: currentJobActions.SET_CURRENT_JOB,
+                currentJobOrderId: orderIdBeingProcessed
+            });
+            dispatch({
+                type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
+            });
+            setTransactionSuccess(true);
+        } catch (err) {
+            setTransactionError(true);
+        }
+        setAddOrderLoading(false);
     }
 
     const getreadableDate = (date) => {
@@ -191,7 +226,7 @@ const CheckOutScreen = props => {
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
-                            addOrder();
+                            addOrder("card");
                         }}
                     >
                         <FontAwesome

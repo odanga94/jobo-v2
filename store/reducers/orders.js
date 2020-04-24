@@ -3,9 +3,11 @@ import {
     ADD_ORDER, 
     SET_ORDERS, 
     UPDATE_ORDER, 
+    REMOVE_ORDER,
     SORT_ORDERS,
     SET_ORDER_ID_BEING_PROCESSED,
-    RESET_ORDER_ID_BEING_PROCESSED 
+    RESET_ORDER_ID_BEING_PROCESSED, 
+    RESET_ORDERS
 } from '../actions/orders';
 
 const initialState = {
@@ -53,6 +55,11 @@ export default (state = initialState, action) => {
                 ...state,
                 orders: updatedOrders
             }
+        case REMOVE_ORDER:
+            return {
+                ...state,
+                orders: state.orders.filter(order => order.id !== action.orderId)
+            }
         case SET_ORDERS:
             return {
                 ...state,
@@ -74,6 +81,8 @@ export default (state = initialState, action) => {
                 ...state,
                 orderIdBeingProcessed: null
             }
+        case RESET_ORDERS:
+            return initialState
         default:
             return state;
     }

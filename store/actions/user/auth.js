@@ -1,5 +1,8 @@
 import * as firebase from 'firebase';
 
+import { RESET_ORDERS } from '../orders';
+import { RESET_PROFILE } from './profile';
+
 export const AUTHENTICATE = 'AUTHENTICATE';
 export const LOG_OUT = 'LOG_OUT';
 
@@ -53,6 +56,12 @@ export const logOut = () => {
         await firebase.auth().signOut();
         dispatch({
             type: LOG_OUT
+        });
+        dispatch({
+            type: RESET_ORDERS
+        });
+        dispatch({
+            type: RESET_PROFILE
         })
     }
 }

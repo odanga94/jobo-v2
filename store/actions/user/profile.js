@@ -7,6 +7,7 @@ export const EDIT_PROFILE = "EDIT_PROFILE";
 export const UPDATE_IMAGE = "UPDATE_IMAGE";
 export const DELETE_IMAGE = "DELETE_IMAGE";
 export const HAS_ORDERS = "HAS_ORDERS";
+export const RESET_PROFILE = "RESET_PROFILE";
 
 export const fetchProfile = (uid) => {
     return async dispatch => {

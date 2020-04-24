@@ -3,7 +3,8 @@ import {
     EDIT_PROFILE, 
     UPDATE_IMAGE, 
     DELETE_IMAGE,
-    HAS_ORDERS
+    HAS_ORDERS,
+    RESET_PROFILE
 } from '../../actions/user/profile';
 
 const initialState = {
@@ -46,6 +47,8 @@ export default (state = initialState, action) => {
                 ...state,
                 hasOrders: action.hasOrders
             }
+        case RESET_PROFILE:
+            return initialState
         default:
             return state
     }

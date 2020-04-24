@@ -35,7 +35,7 @@ const MapScreen = props => {
 
     const [isFetchingLocation, setIsFetchingLocation] = useState(false);
     const [currentLocationRegion, setCurrentLocationRegion] = useState();
-    const [prosLocations, setProsLocations] = useState();
+    const [prosLocations, setProsLocations] = useState([]);
     const [isFetchingCurrentJobDetails, setIsFetchingCurrentJobDetails] = useState(true);
 
     useEffect(() => {
@@ -201,9 +201,21 @@ const MapScreen = props => {
     }
 
     const fetchProLocations = async () => {
-        const dataSnapshot = await firebase.database().ref('pros_locations').once('value');
+        const dataSnapshot = await firebase.database().ref('pros').once('value');
         const results = dataSnapshot.val();
-        setProsLocations(results);
+        //console.log(results)
+        for (let category in results){
+            const pros = results[category];
+            for (let proId in pros){
+                const proDetails = {
+                    proId,
+                    category: category.slice(0, 1).toUpperCase() + category.slice(1),
+                    latitude: pros[proId].primaryLocation.coords.lat,
+                    longitude: pros[proId].primaryLocation.coords.lng
+                }
+                setProsLocations(currState => currState.concat(proDetails));
+            }
+        }
     }
 
     const regionChangedHandler = (region) => {
@@ -223,8 +235,8 @@ const MapScreen = props => {
             >
                 {
                     prosLocations &&
-                    prosLocations.map((proLocation, index) => (
-                        <Marker title={proLocation.type} coordinate={proLocation} key={index /*will be proId later*/}>
+                    prosLocations.map((proLocation) => (
+                        <Marker title={proLocation.category} coordinate={proLocation} key={proLocation.proId}>
                             <Image
                                 source={require('../assets/pro-icon.png')}
                                 style={{ width: 35, height: 35 }}
