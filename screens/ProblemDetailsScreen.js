@@ -36,7 +36,7 @@ import * as profileActions from '../store/actions/user/profile';
 import colors from '../constants/colors';
 
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const ProblemDetailsScreen = props => {
     const { navigation } = props;
@@ -253,7 +253,7 @@ const ProblemDetailsScreen = props => {
 
     return (
         <View style={{ padding: 10, backgroundColor: "white", flex: 1 }}>
-            <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={150} style={{ flex: 1 }}>
+            <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={height / 4.5} style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.screen}>
                     <Fragment>
                         {
@@ -270,6 +270,7 @@ const ProblemDetailsScreen = props => {
                                         })
                                     }}
                                 />
+                                {/* <View style={styles.errorContainer}><Text style={styles.errorText}>This field is required.</Text></View> */}
                             </Fragment>
                         }
                         {
@@ -479,6 +480,15 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         flexDirection: "row",
         justifyContent: "space-between"
+    },
+    errorContainer: {
+        marginTop: -10,
+        marginBottom: 3
+    },
+    errorText: {
+        fontFamily: 'poppins-regular',
+        color: 'red',
+        fontSize: 14
     }
 })
 

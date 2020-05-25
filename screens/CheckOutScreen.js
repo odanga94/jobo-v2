@@ -30,7 +30,8 @@ const CheckOutScreen = props => {
     const dispatch = useDispatch();
     const userId = useSelector(state => state.auth.userId);
     const orderIdBeingProcessed = useSelector(state => state.orders.orderIdBeingProcessed);
-    const userName = useSelector(state => state.profile.name)
+    const userName = useSelector(state => state.profile.name);
+    const { connectionFee } = useSelector(state => state.settings);
 
     const { navigation } = props;
     const orderDetails = navigation.getParam('orderDetails');
@@ -203,7 +204,7 @@ const CheckOutScreen = props => {
                 problemImage={problemImage}
                 orderDetails={orderDetails}
                 date={getreadableDate(orderDetails.dateRequested)}
-                totalAmount={200}
+                totalAmount={connectionFee}
             />
             <View style={{ margin: 20 }}>
                 <View style={styles.paymentTextContainer}>

@@ -12,12 +12,14 @@ import Card from '../components/UI/Card';
 import MainButton from '../components/UI/MainButton';
 import Spinner from '../components/UI/Spinner';
 import defaultStyles from '../constants/default-styles';
+import Colors from '../constants/colors';
+
 import * as locationActions from '../store/actions/location';
 import * as currentJobActions from '../store/actions/currentJob';
 import * as orderActions from '../store/actions/orders';
-import { ADD_ORDER, UPDATE_ORDER, dispatchNewOrder } from '../store/actions/orders';
+import * as settignsActions from '../store/actions/settings';
+import { UPDATE_ORDER, dispatchNewOrder } from '../store/actions/orders';
 import { HAS_ORDERS } from '../store/actions/user/profile';
-import Colors from '../constants/colors';
 
 const convertToSentenceCase = str => str.charAt(0).toUpperCase() + str.slice(1);
 const getreadableDate = (date) => {
@@ -32,6 +34,7 @@ const MapScreen = props => {
     const currentJobOrderId = useSelector(state => state.currentJob.currentJobOrderId);
     const hasOrders = useSelector(state => state.profile.hasOrders);
     const currentOrder = useSelector(state => state.orders.orders.find(order => order.id === currentJobOrderId));
+    const { promotionalMessage } = useSelector(state => state.settings);
 
     const [isFetchingLocation, setIsFetchingLocation] = useState(false);
     const [currentLocationRegion, setCurrentLocationRegion] = useState();
@@ -41,6 +44,7 @@ const MapScreen = props => {
     useEffect(() => {
         getLocationHandler();
         fetchProLocations();
+        fetchAppSettings();
     }, []);
 
     useEffect(() => {
@@ -106,6 +110,14 @@ const MapScreen = props => {
             fetchCurrentJobDetails();
         }
     }, [fromCheckout, currentJobOrderId]);
+
+    const fetchAppSettings = async () => {
+        try {
+            await dispatch(settignsActions.fetchSettings());
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     const fetchCurrentJobDetails = async () => {
         try {
@@ -201,9 +213,9 @@ const MapScreen = props => {
     }
 
     const fetchProLocations = async () => {
+        let prosArr = [];
         const dataSnapshot = await firebase.database().ref('pros').once('value');
         const results = dataSnapshot.val();
-        //console.log(results)
         for (let category in results){
             const pros = results[category];
             for (let proId in pros){
@@ -213,9 +225,11 @@ const MapScreen = props => {
                     latitude: pros[proId].primaryLocation.coords.lat,
                     longitude: pros[proId].primaryLocation.coords.lng
                 }
-                setProsLocations(currState => currState.concat(proDetails));
+                prosArr.push(proDetails);
+                //setProsLocations(currState => currState.concat(proDetails));
             }
         }
+        setProsLocations(prosArr);
     }
 
     const regionChangedHandler = (region) => {
@@ -291,10 +305,9 @@ const MapScreen = props => {
                             }}>View Job Details</MainButton>
                         </View> :
                         <View style={{ flex: 1, justifyContent: "space-between" }}>
-                            <Text style={{ ...defaultStyles.titleText }}>Welcome to Jobo!</Text>
-                            <Text style={defaultStyles.bodyText}>Your one-stop app for Fundis.</Text>
-                            <Text style={{ ...defaultStyles.bodyText, fontWeight: 'bold' }}> User ID is: {userId}</Text>
-                            {!hasOrders && <Text style={defaultStyles.bodyText}>Get 25% discount on your first order!! Valid until 03/05/2020</Text>}
+                            <Text style={{ ...defaultStyles.titleText }}>Welcome to Jobo! Your one-stop app for Fundis.</Text>
+                            <Text style={{ ...defaultStyles.bodyText }}>{promotionalMessage}</Text>
+                            {!hasOrders && <Text style={{...defaultStyles.bodyText, marginVertical: 2}}>Get 25% discount on your first order!!</Text>}
                             <MainButton onPress={() => {
                                 props.navigation.navigate('Services');
                             }}>View Services</MainButton>

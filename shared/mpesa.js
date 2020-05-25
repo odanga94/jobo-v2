@@ -14,19 +14,20 @@ const getMpesaAccessToken = async () => {
             }
         });
         const jsonResponse = await response.json();
-        //console.log(jsonResponse);
+        //console.log('res', jsonResponse);
         return jsonResponse.access_token;
     } catch (err) {
         console.log(err);
         throw new Error("mpesaConfigError");
     }
 }
+//getMpesaAccessToken();
 
 const getPassword = (shortCode, passKey, timeStamp) => {
     let data = shortCode + passKey + timeStamp;
     let buff = new Buffer(data);
     let base64data = buff.toString('base64');
-    //console.log(base64data);
+    //console.log('pass', base64data);
     return base64data;
 }
 
@@ -34,11 +35,20 @@ const formatPhone = phoneNumber => {
     return parseInt('254' + phoneNumber.slice(1));
 }
 
+const generateLongDesc = word => {
+    while (word.length < 1000){
+        word = word + word
+    }
+    console.log(word)
+    return word;
+}
+
 export const billClient = async (userId, orderId, clientPhone) => {
     const oauth_token = await getMpesaAccessToken(),
         url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
         auth = "Bearer " + oauth_token;
     const timeStamp = moment().format('YYYYMMDDHHmmss');
+    //console.log('time', timeStamp)
     const passKey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919";
     const password = getPassword(174379, passKey, timeStamp);
     const phoneNumber = formatPhone(clientPhone);
