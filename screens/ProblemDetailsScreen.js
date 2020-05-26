@@ -30,7 +30,9 @@ import {
     GardeningDetails,
     CookingDetails,
     TaxDetails,
-    CarpenterDetails
+    CarpenterDetails,
+    WellnessDetails,
+    EventsDetails
 } from '../data/problem-details';
 import * as profileActions from '../store/actions/user/profile';
 import colors from '../constants/colors';
@@ -54,6 +56,8 @@ const ProblemDetailsScreen = props => {
     const [roomsThatNeedWork, setRoomsThatNeedWork] = useState();
     const [buildingType, setBuildingType] = useState();
     const [equipmentNeeded, setEquipmentNeeded] = useState();
+    const [serviceNeeded, setServiceNeeded] = useState();
+    const [proGender, setProGender] = useState();
     const [bucketsOfClothes, setBucketsOfClothes] = useState();
     const [mealDescription, setMealDescription] = useState();
     const [numberOfPeople, setNumberOfPeople] = useState();
@@ -114,6 +118,12 @@ const ProblemDetailsScreen = props => {
             case "p9":
                 setServiceDetails(CarpenterDetails);
                 return;
+            case "p13":
+                setServiceDetails(WellnessDetails);
+                return;
+            case "p14":
+                setServiceDetails(EventsDetails);
+                return;
             default:
                 return;
         }
@@ -138,6 +148,10 @@ const ProblemDetailsScreen = props => {
             setBucketsOfClothes(selectedItems);
         } else if (selectedItems && type === 'numberOfPeople') {
             setNumberOfPeople(selectedItems);
+        } else if (selectedItems && type === 'serviceNeeded') {
+            setServiceNeeded(selectedItems);
+        } else if (selectedItems && type === 'proGender') {
+            setProGender(selectedItems)
         }
     }, [pickedLocationAddress, selectedItems, type]);
 
@@ -173,6 +187,8 @@ const ProblemDetailsScreen = props => {
             roomsThatNeedWork: roomsThatNeedWork ? getString(roomsThatNeedWork) : null,
             buildingType: buildingType ? getString(buildingType) : null,
             equipmentNeeded: equipmentNeeded ? getString(equipmentNeeded) : null,
+            serviceNeeded: serviceNeeded ? getString(serviceNeeded) : null,
+            proGender: proGender ? getString(proGender) : null,
             bucketsOfClothes: bucketsOfClothes ? getString(bucketsOfClothes) : null,
             mealDescription: mealDescription ? mealDescription : null,
             numberOfPeople: numberOfPeople ? getString(numberOfPeople) : null,
@@ -182,7 +198,7 @@ const ProblemDetailsScreen = props => {
             dateRequested: new Date().toISOString(),
             status: "pending"
         }
-        if (!clientPhone.trim()){
+        if (!clientPhone.trim()) {
             Alert.alert('Wrong Input!', 'Please enter a valid phone number to contact you on.', [{ text: 'Okay' }]);
             return;
         }
@@ -221,6 +237,14 @@ const ProblemDetailsScreen = props => {
     let renderEquipmentNeeded = '';
     if (equipmentNeeded) {
         renderEquipmentNeeded = renderField(renderEquipmentNeeded, equipmentNeeded);
+    }
+    let renderServiceNeeded = '';
+    if (serviceNeeded) {
+        renderServiceNeeded = renderField(renderServiceNeeded, serviceNeeded);
+    }
+    let renderProGender = '';
+    if (proGender) {
+        renderProGender = renderField(renderProGender, proGender);
     }
     let renderBucketsOfClothes = '';
     if (bucketsOfClothes) {
@@ -261,12 +285,13 @@ const ProblemDetailsScreen = props => {
                             <Fragment>
                                 <Text style={DefaultStyles.bodyText}>{serviceDetails.problemField.fieldName}</Text>
                                 <ListButton
-                                    info={renderProblemInfo ? renderProblemInfo : "Select all that apply"}
+                                    info={renderProblemInfo ? renderProblemInfo : !serviceDetails.problemField.manySelectable ? "Select all that apply" : "Select one"}
                                     pressedHandler={() => {
                                         navigation.navigate('ListItems', {
                                             items: serviceDetails.problemField.items,
                                             type: 'problems',
-                                            alreadySelected: problems
+                                            alreadySelected: problems,
+                                            manySelectable: serviceDetails.problemField.manySelectable
                                         })
                                     }}
                                 />
@@ -351,6 +376,40 @@ const ProblemDetailsScreen = props => {
                                     numberOfLines={5}
                                     onChangeText={setMealDescription}
                                     value={mealDescription}
+                                />
+                            </Fragment>
+                        }
+                        {
+                            serviceDetails.serviceNeeded &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>{serviceDetails.serviceNeeded.fieldName}</Text>
+                                <ListButton
+                                    info={renderServiceNeeded ? renderServiceNeeded : !serviceDetails.serviceNeeded.manySelectable ? "Select all that apply" : "Select one"}
+                                    pressedHandler={() => {
+                                        navigation.navigate('ListItems', {
+                                            items: serviceDetails.serviceNeeded.items,
+                                            type: 'serviceNeeded',
+                                            alreadySelected: serviceNeeded,
+                                            manySelectable: serviceDetails.serviceNeeded.manySelectable
+                                        })
+                                    }}
+                                />
+                            </Fragment>
+                        }
+                        {
+                            serviceDetails.proGender &&
+                            <Fragment>
+                                <Text style={DefaultStyles.bodyText}>{serviceDetails.proGender.fieldName}</Text>
+                                <ListButton
+                                    info={renderProGender ? renderProGender : !serviceDetails.proGender.manySelectable ? "Select all that apply" : "Select one"}
+                                    pressedHandler={() => {
+                                        navigation.navigate('ListItems', {
+                                            items: serviceDetails.proGender.items,
+                                            type: 'proGender',
+                                            alreadySelected: proGender,
+                                            manySelectable: serviceDetails.proGender.manySelectable
+                                        })
+                                    }}
                                 />
                             </Fragment>
                         }

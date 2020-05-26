@@ -11,7 +11,9 @@ class ProblemDetails {
         bucketsOfClothes,
         numberOfTrucks,
         mealDescription,
-        numberOfPeople
+        numberOfPeople,
+        serviceNeeded,
+        proGender
     ) {
         this.problemName = problemName;
         this.problemField = problemField;
@@ -25,6 +27,8 @@ class ProblemDetails {
         this.numberOfTrucks = numberOfTrucks;
         this.mealDescription = mealDescription;
         this.numberOfPeople = numberOfPeople;
+        this.serviceNeeded = serviceNeeded;
+        this.proGender = proGender
     }
 }
 

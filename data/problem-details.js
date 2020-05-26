@@ -55,7 +55,15 @@ export const BeautyDetails = new ProblemDetails(
     undefined,
     undefined,
     true,
-    true
+    true,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    { fieldName: "My gender preference for the professional is", items: ["male", "female", "it doesn't matter"], manySelectable: "no" }
 );
 
 export const MovingDetails = new ProblemDetails(
@@ -131,3 +139,37 @@ export const CarpenterDetails = new ProblemDetails(
     true,
     true
 );
+
+export const WellnessDetails = new ProblemDetails(
+    "wellness",
+    undefined,
+    undefined,
+    undefined,
+    true,
+    true,
+    undefined,
+    { fieldName: "Training equipment to be provided by", items: ["me", "the instructor"], manySelectable: "no" },
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    { fieldName: "What type of wellness service would you like?", items: ["Personal Trainer", "Yoga Instructor", "Nutritionist", "Massage Therapist"], manySelectable: "no" },
+    { fieldName: "My gender preference for the instructor is", items: ["male", "female", "it doesn't matter"], manySelectable: "no" }
+);
+
+export const EventsDetails = new ProblemDetails(
+    "events",
+    { fieldName: 'What type of event are you having ?', items: ['Wedding', 'Corporate Event', 'Family Event', 'Others'], manySelectable: "no" },
+    undefined,
+    undefined,
+    true,
+    true,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    { fieldName: "How many people will your event host ?", items: ["<50", "50 - 100", "101 - 150", "151 - 200", "201 - 250", "251 - 300", "more than 300"], manySelectable: "no" },
+    { fieldName: 'What kind of service would you like ?', items: ['Catering', 'Event Photography', 'Equipment Rental', 'Live Band', 'DJ', 'Decor', 'Event Hair Stylist', 'Event Makeup Artist', 'Others'] },
+
+)
