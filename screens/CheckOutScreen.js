@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import {
     View,
@@ -8,7 +8,9 @@ import {
     Dimensions,
     TouchableOpacity,
     Image,
+    Modal as RNModal
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesome } from '@expo/vector-icons';
 import * as firebase from 'firebase';
@@ -198,6 +200,56 @@ const CheckOutScreen = props => {
         );
     }
 
+    if (paymentType === "card") {
+        return (
+            <RNModal visible={paymentType === "card"} pressed={() => setPaymentType("mpesa")}>
+                {/* <View style={styles.successContainer}> */}
+                    <WebView
+                        originWhitelist={['*']}
+                        source={{
+                            html: `
+                                <!DOCTYPE html>
+
+                                <head>
+                                    <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Ensures optimal rendering on mobile devices. -->
+                                    <meta http-equiv="X-UA-Compatible" content="IE=edge" /> <!-- Optimal Internet Explorer compatibility -->
+                                </head>
+
+                                <body style="padding:100;">
+                                    <script
+                                        src="https://www.paypal.com/sdk/js?client-id=AVoQ85IJ9z7Rqs7NyM7vt_ctwJZLgqE_lC3j4yvMXvSSIeQ1KoFHKzlX1k5OfuAbBOWB8a4nPdgZi6m8"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
+                                    </script>
+
+                                    <div id="paypal-button-container"></div>
+
+                                    
+                                    <script>
+                                        paypal.Buttons({
+                                            style: {
+                                                shape: "pill"
+                                            },
+                                            createOrder: function(data, actions) {
+                                                // This function sets up the details of the transaction, including the amount and line item details.
+                                                return actions.order.create({
+                                                    purchase_units: [{
+                                                        amount: {
+                                                            value: '0.01'
+                                                        }
+                                                    }]
+                                                });
+                                            }
+                                        }).render('#paypal-button-container');
+                                    </script>
+                                </body>
+                        `}}
+                    >
+                    </WebView>
+                {/* </View> */}
+
+            </RNModal>
+        )
+    }
+
     return (
         <ScrollView style={{ backgroundColor: "white" }}>
             <OrderSummary
@@ -227,7 +279,8 @@ const CheckOutScreen = props => {
                     <TouchableOpacity
                         style={styles.button}
                         onPress={() => {
-                            addOrder("card");
+                            setPaymentType("card");
+                            //addOrder("card");
                         }}
                     >
                         <FontAwesome
