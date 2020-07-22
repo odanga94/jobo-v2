@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useSelector, useDispatch } from 'react-redux';
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import * as firebase from 'firebase';
 
 import Modal from '../components/UI/Modal';
@@ -26,7 +26,7 @@ import * as orderActions from '../store/actions/orders';
 import * as profileActions from '../store/actions/user/profile';
 import * as currentJobActions from '../store/actions/currentJob';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const CheckOutScreen = props => {
     const dispatch = useDispatch();
@@ -204,46 +204,22 @@ const CheckOutScreen = props => {
         return (
             <RNModal visible={paymentType === "card"} pressed={() => setPaymentType("mpesa")}>
                 {/* <View style={styles.successContainer}> */}
-                    <WebView
-                        originWhitelist={['*']}
-                        source={{
-                            html: `
-                                <!DOCTYPE html>
-
-                                <head>
-                                    <meta name="viewport" content="width=device-width, initial-scale=1"> <!-- Ensures optimal rendering on mobile devices. -->
-                                    <meta http-equiv="X-UA-Compatible" content="IE=edge" /> <!-- Optimal Internet Explorer compatibility -->
-                                </head>
-
-                                <body style="padding:100;">
-                                    <script
-                                        src="https://www.paypal.com/sdk/js?client-id=AVoQ85IJ9z7Rqs7NyM7vt_ctwJZLgqE_lC3j4yvMXvSSIeQ1KoFHKzlX1k5OfuAbBOWB8a4nPdgZi6m8"> // Required. Replace SB_CLIENT_ID with your sandbox client ID.
-                                    </script>
-
-                                    <div id="paypal-button-container"></div>
-
-                                    
-                                    <script>
-                                        paypal.Buttons({
-                                            style: {
-                                                shape: "pill"
-                                            },
-                                            createOrder: function(data, actions) {
-                                                // This function sets up the details of the transaction, including the amount and line item details.
-                                                return actions.order.create({
-                                                    purchase_units: [{
-                                                        amount: {
-                                                            value: '0.01'
-                                                        }
-                                                    }]
-                                                });
-                                            }
-                                        }).render('#paypal-button-container');
-                                    </script>
-                                </body>
-                        `}}
-                    >
-                    </WebView>
+                <View style={styles.cancelButtonContainer}>
+                    <TouchableOpacity onPress={() => setPaymentType("mpesa")} >
+                        <Ionicons size={35} name="md-close" />
+                    </TouchableOpacity>
+                </View>
+                <WebView
+                    originWhitelist={['*']}
+                    source={{
+                        uri: `http://192.168.100.36:3000/${userId}` //pass user ID and order ID as params
+                    }}
+                    onMessage={(event) => {
+                        console.log(event);
+                        setPaymentType("mpesa")
+                    }}
+                >
+                </WebView>
                 {/* </View> */}
 
             </RNModal>
@@ -322,6 +298,12 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: "white",
         width: "85%"
+    },
+    cancelButtonContainer: {
+        height: height / 12,
+        borderBottomColor: "#505050",
+        borderBottomWidth: 2,
+        padding: 10
     },
     paymentContainer: {
         flexDirection: "row",
