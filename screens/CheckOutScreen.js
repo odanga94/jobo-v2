@@ -45,6 +45,8 @@ const CheckOutScreen = props => {
     const [transactionSuccess, setTransactionSuccess] = useState(false);
     const [transactionError, setTransactionError] = useState(false);
     const [paymentType, setPaymentType] = useState("mpesa");
+    const [cardPaymentMessage, setCardPaymentMessage] = useState("");
+    const [payPalPaid, setPayPalPaid] = useState(false);
 
     useEffect(() => {
         const paymentRef = firebase.database().ref(`payments/${userId}/${orderIdBeingProcessed}`);
@@ -77,10 +79,12 @@ const CheckOutScreen = props => {
         }
 
         if (userId && orderIdBeingProcessed) {
+            if(payPalPaid) {
+                processCardOrder(cardPaymentMessage, orderIdBeingProcessed);
+                return;
+            }
             if (paymentType === "mpesa") {
                 paymentRef.on("child_added", handleChildAdded);
-            } else {
-                processCardOrder();
             }
         }
 
@@ -101,7 +105,6 @@ const CheckOutScreen = props => {
     const addOrder = async (type) => {
         setAddOrderError(null);
         setAddOrderLoading(true);
-        setPaymentType(type);
         try {
             if (!navigation.getParam('initiallyHadPhoneNo')) {
                 dispatch(profileActions.editProfile(
@@ -122,21 +125,39 @@ const CheckOutScreen = props => {
         }
     }
 
-    const processCardOrder = async () => {
-        try {
-            await firebase.database().ref(`pending_jobs/${userId}`)
-                .set({ currentJobOrderId: orderIdBeingProcessed });
-            dispatch({
-                type: currentJobActions.SET_CURRENT_JOB,
-                currentJobOrderId: orderIdBeingProcessed
-            });
-            dispatch({
-                type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
-            });
-            setTransactionSuccess(true);
-        } catch (err) {
+    const processCardOrder = async (message, orderId) => {
+        console.log('payment info', message);
+
+        if (message === 'Payment Successful'){
+            try {
+                await dispatch(currentJobActions.addCurrentJob(orderId));
+                dispatch({
+                    type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
+                });
+                setTransactionSuccess(true);
+              
+            } catch (err) {
+                setTransactionError(true);
+            }
+        } else if(message === 'Payment Error'){
             setTransactionError(true);
-        }
+            try{
+                await admin.database().ref(`orders/${userId}/${orderId}`)
+                    .update({ status: "cancelled" });
+                dispatch({
+                    type: orderActions.UPDATE_ORDER,
+                    orderId: orderId,
+                    valueToUpdate: "status",
+                    value: "cancelled"
+                });
+                dispatch({
+                    type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
+                });
+            } catch (err){
+                console.log(err);
+            }
+        }  
+        setPayPalPaid(false);
         setAddOrderLoading(false);
     }
 
@@ -212,11 +233,13 @@ const CheckOutScreen = props => {
                 <WebView
                     originWhitelist={['*']}
                     source={{
-                        uri: `http://192.168.100.36:3000/${userId}` //pass user ID and order ID as params
+                        uri: `http://192.168.100.36:3000/` //pass user ID and order ID as params
                     }}
                     onMessage={(event) => {
-                        console.log(event);
-                        setPaymentType("mpesa")
+                        setPaymentType("mpesa");
+                        setCardPaymentMessage(event.nativeEvent.data);
+                        setPayPalPaid(true);
+                        addOrder("card");
                     }}
                 >
                 </WebView>
