@@ -186,7 +186,7 @@ const SupportForm = props => {
                                                     setCategory();
                                                     props.pressed();
                                                 }}
-                                                style={{ width: width / 3, backgroundColor: 'red', height: 50 }}
+                                                style={{ width: width / 3, backgroundColor: '#ff726f', height: 50 }}
                                             >
                                                 Cancel
                                         </MainButton>

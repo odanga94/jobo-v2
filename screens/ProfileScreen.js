@@ -31,6 +31,7 @@ import Colors from '../constants/colors';
 import DefaultStyles from '../constants/default-styles';
 import { MaterialHeaderButton } from '../components/UI/HeaderButton';
 import Input from '../components/UI/Input';
+import * as firebase from 'firebase';
 
 const { height, width } = Dimensions.get('window');
 
@@ -83,6 +84,48 @@ const ProfileScreen = props => {
         setIsLoading(true);
         await dispatch(authActions.logOut());
         props.navigation.navigate('Auth');
+    }
+
+    const deleteProfileHandler = async () => {
+        setIsLoading(true);
+        try {
+            await firebase.database().ref(`user_profiles/${userId}`).remove();
+            try {
+                await firebase.storage().ref(`images/${userId}/profilePic.jpg`).delete();
+            } catch (err) {
+                if (err.code_ === "storage/object-not-found") {
+                    try {
+                        await firebase.storage().ref(`images/${userId}/profilePic.jpeg`).delete();
+                    } catch (err) {
+                        if (err.code_ === "storage/object-not-found") {
+                            try {
+                                await firebase.storage().ref(`images/${userId}/profilePic.png`).delete();
+                            } catch (err) {
+                                console.log(err);
+                                await firebase.auth().currentUser.delete();
+                                await logOutHandler();
+                                return;
+                            }
+                        } else {
+                            console.log(err);
+                            await firebase.auth().currentUser.delete();
+                            await logOutHandler();
+                            return;
+                        }
+                    }
+                } else {
+                    console.log(err);
+                    await firebase.auth().currentUser.delete();
+                    await logOutHandler();
+                    return;
+                }
+            }
+            await firebase.auth().currentUser.delete();
+            await logOutHandler();
+        } catch (err) {
+            console.log(err);
+        }
+        setIsLoading(false);
     }
 
     const toggleEditMode = useCallback(value => {
@@ -193,13 +236,13 @@ const ProfileScreen = props => {
                     editPictureHandler('launch-gallery');
                     return;
                 case 2:
-                    if (!imageUri){
+                    if (!imageUri) {
                         return;
                     }
                     try {
                         await dispatch(profileActions.deleteProfilePic(userId));
                         setPickedImage(null);
-                    } catch(err) {
+                    } catch (err) {
                         Alert.alert('An error occurred!', err.message, [{ text: 'Okay' }]);
                     }
                 default:
@@ -310,7 +353,7 @@ const ProfileScreen = props => {
                                 onPress={() => {
                                     setIsEditMode(false);
                                 }}
-                                style={{ backgroundColor: 'red', width: width / 2.5, height: 50 }}
+                                style={{ backgroundColor: '#ff726f', width: width / 2.5, height: 50 }}
                             >
                                 Cancel
                         </MainButton>
@@ -328,9 +371,31 @@ const ProfileScreen = props => {
             </View>
             {isLoading ?
                 <Spinner /> :
-                <MainButton onPress={logOutHandler}>
-                    Sign Out
-                </MainButton>
+                <View>
+                    <MainButton onPress={logOutHandler}>
+                        Sign Out
+                    </MainButton>
+                    <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => {
+                            Alert.alert('Are you sure?', 'Do you really want to permanently delete your profile? This action is irreversible', [
+                                { text: 'No', style: 'default' },
+                                {
+                                    text: 'Yes', style: 'destructive', onPress: () => {
+                                        console.log('deleting...');
+                                        deleteProfileHandler();
+                                    }
+                                }
+                            ])
+                        }}
+                    >
+                        <Ionicons size={30} name="ios-warning" color="white" />
+                        <Text style={{ fontFamily: "poppins-regular", color: "white", fontSize: 18, marginLeft: 5 }}>
+                            Delete Profile
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
             }
         </View>
     )
@@ -392,6 +457,17 @@ const styles = StyleSheet.create({
     },
     textInput: {
         paddingRight: 40
+    },
+    deleteButton: {
+        backgroundColor: "#ff726f",
+        marginTop: 20,
+        justifyContent: "center",
+        flexDirection: "row",
+        alignItems: "center",
+        borderRadius: 30,
+        paddingVertical: 12,
+        paddingHorizontal: 30,
+
     }
 })
 

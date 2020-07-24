@@ -233,7 +233,7 @@ const CheckOutScreen = props => {
                 <WebView
                     originWhitelist={['*']}
                     source={{
-                        uri: `http://192.168.100.36:3000/` //pass user ID and order ID as params
+                        uri: `https://jobo-card-payment.web.app/`//`http://192.168.100.36:3000/` //pass user ID and order ID as params
                     }}
                     onMessage={(event) => {
                         setPaymentType("mpesa");

@@ -1,3 +1,4 @@
+import { auth as firebaseAuth } from 'firebase';
 const moment = require('moment');
 const fetch = require('node-fetch');
 import { Buffer } from 'buffer';
@@ -44,6 +45,8 @@ const generateLongDesc = word => {
 }
 
 export const billClient = async (userId, orderId, clientPhone) => {
+    const firebaseToken = await firebaseAuth().currentUser.getIdToken(true);
+    console.log('token', firebaseToken);
     const oauth_token = await getMpesaAccessToken(),
         url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
         auth = "Bearer " + oauth_token;
@@ -61,7 +64,7 @@ export const billClient = async (userId, orderId, clientPhone) => {
         "PartyA": phoneNumber,
         "PartyB": 174379,
         "PhoneNumber": phoneNumber,
-        "CallBackURL": `https://jobo-3a84b.firebaseio.com/payments/${userId}/${orderId}.json`,
+        "CallBackURL": `https://jobo-3a84b.firebaseio.com/payments/${userId}/${orderId}.json?auth=${firebaseToken}`,
         "AccountReference": "Jobo",
         "TransactionDesc": "Jobo",
     });
