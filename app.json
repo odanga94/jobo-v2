@@ -30,7 +30,7 @@
     },
     "android": {
       "package": "com.odanga.jobo",
-      "versionCode": 3,
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -43,7 +43,13 @@
         "googleMaps": {
           "apiKey": "AIzaSyBD7RtYlg5sRPU4EPu3yfHCZHWHf0fxSf4"
         }
-      }
+      },
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     }
   }
 }
