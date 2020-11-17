@@ -172,4 +172,39 @@ export const EventsDetails = new ProblemDetails(
     { fieldName: "How many people will your event host ?", items: ["<50", "50 - 100", "101 - 150", "151 - 200", "201 - 250", "251 - 300", "more than 300"], manySelectable: "no" },
     { fieldName: 'What kind of service would you like ?', items: ['Catering', 'Event Photography', 'Equipment Rental', 'Live Band', 'DJ', 'Decor', 'Event Hair Stylist', 'Event Makeup Artist', 'Others'] },
 
-)
+);
+
+export const BuilderDetails = new ProblemDetails(
+    "building",
+    undefined,
+    undefined,
+    undefined,
+    true,
+    true,
+    { fieldName: "What type of house would you like built ?", items: ['Apartment', 'One-story house', 'Two-story house', 'Others'], manySelectable: "no" },
+);
+
+export const TilesDetails = new ProblemDetails(
+    "tiles",
+    undefined,
+    undefined,
+    { fieldName: 'Which room(s) would you like to be tiled ?', items: ['Bathroom', 'Kitchen', 'Laundry room', 'Outdoors', 'Toilet', 'Entire building', 'Others']},
+    true,
+    true,
+);
+
+export const GraphicDesignDetails = new ProblemDetails(
+    "graphicDesign",
+    undefined,
+    undefined,
+    undefined,
+    true,
+    true,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    { fieldName: 'What kind of design work would you like ?', items: ['Logo Design', 'Web Design', 'Brand Identity Design', 'Photo Editing', 'Others'] }
+);

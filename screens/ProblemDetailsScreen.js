@@ -7,7 +7,8 @@ import {
     TextInput,
     Dimensions,
     KeyboardAvoidingView,
-    Alert
+    Alert,
+    Platform
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -32,7 +33,10 @@ import {
     TaxDetails,
     CarpenterDetails,
     WellnessDetails,
-    EventsDetails
+    EventsDetails,
+    BuilderDetails,
+    TilesDetails,
+    GraphicDesignDetails
 } from '../data/problem-details';
 import * as profileActions from '../store/actions/user/profile';
 import colors from '../constants/colors';
@@ -91,38 +95,47 @@ const ProblemDetailsScreen = props => {
             case "p3":
                 setServiceDetails(ElectricalDetails);
                 return;
-            case "p8":
-                setServiceDetails(PaintingDetails);
-                return;
             case "p4":
-                setServiceDetails(BeautyDetails);
+                setServiceDetails(EventsDetails);
                 return;
             case "p5":
-                setServiceDetails(MovingDetails);
-                return;
-            case "p11":
-                setServiceDetails(ITDetails);
-                return;
-            case "p12":
-                setServiceDetails(PestControlDetails);
-                return;
-            case "p6":
-                setServiceDetails(GardeningDetails);
-                return;
-            case "p7":
-                setServiceDetails(CookingDetails);
-                return;
-            case "p10":
                 setServiceDetails(TaxDetails);
                 return;
+            case "p6":
+                setServiceDetails(BeautyDetails);
+                return;
+            case "p7":
+                setServiceDetails(MovingDetails);
+                return;
+            case "p8":
+                setServiceDetails(ITDetails);
+                return;
             case "p9":
-                setServiceDetails(CarpenterDetails);
+                setServiceDetails(PaintingDetails);
+                return;
+            case "p10":
+                setServiceDetails(GardeningDetails);
+                return;
+            case "p11":
+                setServiceDetails(GraphicDesignDetails);
+                return;
+            case "p12":
+                setServiceDetails(TilesDetails);
                 return;
             case "p13":
-                setServiceDetails(WellnessDetails);
+                setServiceDetails(BuilderDetails);
                 return;
             case "p14":
-                setServiceDetails(EventsDetails);
+                setServiceDetails(WellnessDetails);
+                return;
+            case "p15":
+                setServiceDetails(CookingDetails);
+                return;
+            case "p16":
+                setServiceDetails(CarpenterDetails)
+                return;
+            case "p17":
+                setServiceDetails(PestControlDetails);
                 return;
             default:
                 return;
@@ -277,7 +290,7 @@ const ProblemDetailsScreen = props => {
 
     return (
         <View style={{ padding: 10, backgroundColor: "white", flex: 1 }}>
-            <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={height / 4.5} style={{ flex: 1 }}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={height/4.5} style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.screen}>
                     <Fragment>
                         {

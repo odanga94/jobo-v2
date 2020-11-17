@@ -6,21 +6,15 @@ import {
     StyleSheet,
     ScrollView,
     Dimensions,
-    TouchableOpacity,
     Image,
-    Modal as RNModal
 } from 'react-native';
-import { WebView } from 'react-native-webview';
 import { useSelector, useDispatch } from 'react-redux';
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import * as firebase from 'firebase';
 
 import Modal from '../components/UI/Modal';
 import MainButton from '../components/UI/MainButton';
 import Spinner from '../components/UI/Spinner';
 import OrderSummary from '../components/OrderSummary';
 import DefaultStyles from '../constants/default-styles';
-import Colors from '../constants/colors';
 
 import * as orderActions from '../store/actions/orders';
 import * as profileActions from '../store/actions/user/profile';
@@ -31,7 +25,7 @@ const { width, height } = Dimensions.get('window');
 const CheckOutScreen = props => {
     const dispatch = useDispatch();
     const userId = useSelector(state => state.auth.userId);
-    const orderIdBeingProcessed = useSelector(state => state.orders.orderIdBeingProcessed);
+    //const orderIdBeingProcessed = useSelector(state => state.orders.orderIdBeingProcessed);
     const userName = useSelector(state => state.profile.name);
     const { connectionFee } = useSelector(state => state.settings);
 
@@ -44,11 +38,11 @@ const CheckOutScreen = props => {
     const [addOrderError, setAddOrderError] = useState();
     const [transactionSuccess, setTransactionSuccess] = useState(false);
     const [transactionError, setTransactionError] = useState(false);
-    const [paymentType, setPaymentType] = useState("mpesa");
-    const [cardPaymentMessage, setCardPaymentMessage] = useState("");
-    const [payPalPaid, setPayPalPaid] = useState(false);
+    //const [paymentType, setPaymentType] = useState("mpesa");
+    //const [cardPaymentMessage, setCardPaymentMessage] = useState("");
+    //const [payPalPaid, setPayPalPaid] = useState(false);
 
-    useEffect(() => {
+    /* useEffect(() => {
         const paymentRef = firebase.database().ref(`payments/${userId}/${orderIdBeingProcessed}`);
         const handleChildAdded = (dataSnapshot) => {
             const dataWritten = dataSnapshot.val();
@@ -79,7 +73,7 @@ const CheckOutScreen = props => {
         }
 
         if (userId && orderIdBeingProcessed) {
-            if(payPalPaid) {
+            if (payPalPaid) {
                 processCardOrder(cardPaymentMessage, orderIdBeingProcessed);
                 return;
             }
@@ -89,7 +83,7 @@ const CheckOutScreen = props => {
         }
 
         return () => paymentRef.off("child_added", handleChildAdded);
-    }, [userId, orderIdBeingProcessed]);
+    }, [userId, orderIdBeingProcessed]); */
 
     useEffect(() => {
         let goToMap;
@@ -102,7 +96,7 @@ const CheckOutScreen = props => {
         return () => clearTimeout(goToMap);
     }, [transactionSuccess])
 
-    const addOrder = async (type) => {
+    const addOrder = async () => {
         setAddOrderError(null);
         setAddOrderLoading(true);
         try {
@@ -115,33 +109,34 @@ const CheckOutScreen = props => {
                     }
                 ));
             }
-            await dispatch(orderActions.addOrder(userId, orderDetails, problemImage, type, clientPhone));
+            await dispatch(orderActions.addOrder(userId, orderDetails, problemImage, clientPhone));
             dispatch({
                 type: orderActions.SORT_ORDERS
             });
+            setTransactionSuccess(true);
         } catch (err) {
             setAddOrderError(err.message);
-            setAddOrderLoading(false);
         }
+        setAddOrderLoading(false);
     }
 
-    const processCardOrder = async (message, orderId) => {
+    /* const processCardOrder = async (message, orderId) => {
         console.log('payment info', message);
 
-        if (message === 'Payment Successful'){
+        if (message === 'Payment Successful') {
             try {
                 await dispatch(currentJobActions.addCurrentJob(orderId));
                 dispatch({
                     type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
                 });
                 setTransactionSuccess(true);
-              
+
             } catch (err) {
                 setTransactionError(true);
             }
-        } else if(message === 'Payment Error'){
+        } else if (message === 'Payment Error') {
             setTransactionError(true);
-            try{
+            try {
                 await admin.database().ref(`orders/${userId}/${orderId}`)
                     .update({ status: "cancelled" });
                 dispatch({
@@ -153,13 +148,13 @@ const CheckOutScreen = props => {
                 dispatch({
                     type: orderActions.RESET_ORDER_ID_BEING_PROCESSED
                 });
-            } catch (err){
+            } catch (err) {
                 console.log(err);
             }
-        }  
+        }
         setPayPalPaid(false);
         setAddOrderLoading(false);
-    }
+    } */
 
     const getreadableDate = (date) => {
         return moment(date).format('MMMM Do YYYY, h:mm a')
@@ -191,7 +186,7 @@ const CheckOutScreen = props => {
         return (
             <Modal visible={transactionSuccess} pressed={navigateToMap}>
                 <View style={styles.successContainer}>
-                    <Text style={{ ...DefaultStyles.titleText, textAlign: "center" }}>Payment of KES. 200 Successful!</Text>
+                    <Text style={{ ...DefaultStyles.titleText, textAlign: "center" }}>Your Order was Successful!</Text>
                     <Image source={require('../assets/success-tick.png')} style={{ width: 150, height: 150, marginVertical: 15 }} />
                     <MainButton
                         style={{ marginTop: 20 }}
@@ -221,10 +216,10 @@ const CheckOutScreen = props => {
         );
     }
 
-    if (paymentType === "card") {
+    /* if (paymentType === "card") {
         return (
             <RNModal visible={paymentType === "card"} pressed={() => setPaymentType("mpesa")}>
-                {/* <View style={styles.successContainer}> */}
+                {/* <View style={styles.successContainer}>
                 <View style={styles.cancelButtonContainer}>
                     <TouchableOpacity onPress={() => setPaymentType("mpesa")} >
                         <Ionicons size={35} name="md-close" />
@@ -243,11 +238,11 @@ const CheckOutScreen = props => {
                     }}
                 >
                 </WebView>
-                {/* </View> */}
+                {/* </View> 
 
             </RNModal>
         )
-    }
+    } */
 
     return (
         <ScrollView style={{ backgroundColor: "white" }}>
@@ -259,9 +254,19 @@ const CheckOutScreen = props => {
             />
             <View style={{ margin: 20 }}>
                 <View style={styles.paymentTextContainer}>
-                    <Text style={{ ...DefaultStyles.titleText, color: "#505050" }}>Pay with:</Text>
+                    <Text style={{ ...DefaultStyles.titleText, color: "#505050" }}>Payment Note:</Text>
                 </View>
-                <View style={styles.paymentContainer}>
+                <Text style={{ ...DefaultStyles.bodyText, fontSize: 14 }}>
+                    Currently we only accept payments via M-Pesa. Once the job is done kindly pay to the till number below.
+                </Text>
+                <View style={styles.mpesaContainer}>
+                    <Image
+                        style={styles.image}
+                        source={require('../assets/mpesa-till.jpg')}
+                        resizeMode="contain"
+                    />
+                </View>
+                {/* <View style={styles.paymentContainer}>
                     <TouchableOpacity
                         onPress={() => {
                             addOrder("mpesa");
@@ -289,17 +294,24 @@ const CheckOutScreen = props => {
                         />
                         <Text style={{ ...DefaultStyles.bodyText, marginLeft: 10, fontSize: 16 }}>Card</Text>
                     </TouchableOpacity>
-                </View>
+                </View> */}
             </View>
-            <View style={{ marginHorizontal: 20, alignItems: "center", marginTop: 20 }}>
+            <View style={styles.buttonContainer}>
                 <MainButton
                     onPress={() => {
                         navigation.navigate('Map');
                     }}
-                    style={{ backgroundColor: '#dd0000', height: 50 }}
+                    style={{ backgroundColor: '#dd0000', width: width / 2.3, height: 50 }}
                 >
-                    Cancel Order
-            </MainButton>
+                    Cancel
+                </MainButton>
+                <MainButton
+                    style={{ width: width / 2.3, height: 50 }}
+                    onPress={() => {
+                        addOrder()
+                        //goToCheckOut();
+                    }}
+                >Request</MainButton>
             </View>
 
 
@@ -332,6 +344,11 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
     },
+    mpesaContainer: {
+        width: width / 2,
+        maxHeight: width / 2,
+        //marginTop: 5
+    },
     button: {
         width: width / 2.5,
         height: 50,
@@ -342,15 +359,22 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     image: {
-        width: 30,
-        height: 23
+        width: '100%',
+        height: '100%'
+        //maxHeight: width / 3
     },
     paymentTextContainer: {
         borderBottomColor: "#505050",
         borderBottomWidth: 1,
         width: width / 2.5,
         marginBottom: 10
-    }
+    },
+    buttonContainer: {
+        marginBottom: 20,
+        marginHorizontal: 20,
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
 });
 
 export default CheckOutScreen;

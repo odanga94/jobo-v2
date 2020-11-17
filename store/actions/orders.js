@@ -2,7 +2,6 @@ import * as firebase from 'firebase';
 
 import Order from '../../models/order';
 import { uploadImage } from '../../shared/functions';
-import { billClient } from '../../shared/mpesa';
 import * as currentJobActions from './currentJob';
 
 export const ADD_ORDER = 'ADD_ORDER';
@@ -52,7 +51,7 @@ export const fetchOrders = (userId) => {
         try {
             const dataSnapshot = await firebase.database().ref(`orders/${userId}`).once('value');
             const resData = dataSnapshot.val();
-            if(!resData){
+            if (!resData) {
                 dispatch({
                     type: SET_ORDERS,
                     orders: []
@@ -66,7 +65,7 @@ export const fetchOrders = (userId) => {
                     { ...resData[orderId] }
                 )
             });
-            
+
             for (let i = fetchedOrders.length - 1; i >= 0; i--) {
                 if (fetchedOrders[i].orderDetails.assignedProId) {
                     let proDetails = "";
@@ -92,18 +91,18 @@ export const fetchOrders = (userId) => {
                                 proPhone: proDetails ? proDetails.phone : "",
                                 proImage: proImageUrl ? proImageUrl : ""
                             },
-                            "fetch orders" 
+                            "fetch orders"
                         )
                     );
-                    
+
                 } else {
                     dispatch(
-                        dispatchNewOrder( 
+                        dispatchNewOrder(
                             fetchedOrders[i].id,
                             {
                                 ...fetchedOrders[i].orderDetails,
                             },
-                            "fetch orders" 
+                            "fetch orders"
                         )
                     );
 
@@ -117,14 +116,14 @@ export const fetchOrders = (userId) => {
 }
 
 export const dispatchNewOrder = (orderId, orderDetails, from) => {
-        return {
-            type: ADD_ORDER,
-            orderDetails,
-            orderId
-        };
+    return {
+        type: ADD_ORDER,
+        orderDetails,
+        orderId
+    };
 }
 
-export const addOrder = (userId, orderDetails, imageUri, paymentType, clientPhone) => {
+export const addOrder = (userId, orderDetails, imageUri, clientPhone) => {
     return async (dispatch) => {
         let orderId;
         try {
@@ -132,23 +131,20 @@ export const addOrder = (userId, orderDetails, imageUri, paymentType, clientPhon
             const orderRefArray = orderRef.toString().split('/');
             orderId = orderRefArray[orderRefArray.length - 1];
             //console.log('[ORDER_ID]', orderId);
-            if(paymentType === "mpesa"){
+            /* if (paymentType === "mpesa") {
                 await billClient(userId, orderId, clientPhone);
-            }
+            } */
             dispatch(dispatchNewOrder(orderId, orderDetails, "checkout"));
-            dispatch({
-                type: SET_ORDER_ID_BEING_PROCESSED,
-                orderId
-            });
+            await dispatch(currentJobActions.addCurrentJob(orderId));
         } catch (err) {
             console.log(err);
-            if(err.message = "mpesaConfigError"){
+            /* if (err.message = "mpesaConfigError") {
                 await firebase.database().ref(`orders/${userId}/${orderId}`).remove();
                 dispatch({
                     type: REMOVE_ORDER,
                     orderId
                 });
-            }
+            } */
             throw new Error('Something went wrong 😞.  Please try again later.');
         }
         if (imageUri) {

@@ -21,6 +21,7 @@ const { width, height } = Dimensions.get('window');
 
 const OrderSummary = props => {
     const { orderDetails, date, totalAmount, problemImage } = props;
+
     const imagePreviewUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${orderDetails.clientLocation.lat},${orderDetails.clientLocation.lng}&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:%7C${orderDetails.clientLocation.lat},${orderDetails.clientLocation.lng}&key=${ENV.googleApiKey}`;
 
     const formatToSentenceCase = text => text.split("")[0].toUpperCase() + text.slice(1);
@@ -36,6 +37,49 @@ const OrderSummary = props => {
                     </View>
                     <Text style={styles.title}>status: <Text style={{ fontFamily: 'poppins-bold', color: orderDetails.status === "cancelled" ? "red" : Colors.secondary }}>{formatToSentenceCase(orderDetails.status)}</Text></Text>
                 </View>
+                {
+                    (orderDetails.status === "in progress" || orderDetails.status === "completed") &&
+                    <Card style={{ padding: 10, marginVertical: 10 }}>
+                        {
+                            !orderDetails.proName || !orderDetails.proPhone ?
+                                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                                    <Spinner />
+                                </View> :
+                                <Fragment>
+                                    <Text style={{ ...styles.title, textAlign: "center" }}><Text style={{ fontFamily: 'poppins-bold' }}>Pro Details</Text></Text>
+                                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                                        <View style={{ flexDirection: "row", flex: 2 }}>
+                                            <View style={styles.imageContainer}>
+                                                <Image source={{ uri: orderDetails.proImage }} style={styles.proImage} />
+                                            </View>
+                                            <View style={styles.proTextContainer}>
+                                                <Text style={[styles.description, { textAlign: 'left', fontWeight: "bold" }]}>{orderDetails.proName}</Text>
+                                            </View>
+                                        </View>
+                                        {
+                                            orderDetails.proPhone && orderDetails.status === "in progress" &&
+                                            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+                                                <TouchableOpacity
+                                                    onPress={() => {
+                                                        Linking.openURL(`tel:${orderDetails.proPhone}`)
+                                                    }}
+                                                    style={styles.button}
+                                                >
+                                                    <Feather
+                                                        name="phone"
+                                                        color="white"
+                                                        size={30}
+                                                    />
+                                                    <Text style={{ ...DefaultStyles.titleText, marginHorizontal: 10, color: "white" }}>Call</Text>
+                                                </TouchableOpacity>
+
+                                            </View>
+                                        }
+                                    </View>
+                                </Fragment>
+                        }
+                    </Card>
+                }
                 <View style={{ marginVertical: 10 }}>
                     <Text style={styles.title}>You requested for <Text style={{ fontFamily: 'poppins-bold' }}>{formatToSentenceCase(orderDetails.problemType)}</Text> service.</Text>
                     {
@@ -91,51 +135,9 @@ const OrderSummary = props => {
                             </View>
                     }
                 </View>
-                {
-                    (orderDetails.status === "in progress" || orderDetails.status === "completed") &&
-                    <Card style={{ padding: 10, marginTop: 10 }}>
-                        {
-                            !orderDetails.proName || !orderDetails.proPhone ?
-                                <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                                    <Spinner />
-                                </View> :
-                                <Fragment>
-                                    <Text style={{ ...styles.title, textAlign: "center" }}><Text style={{ fontFamily: 'poppins-bold' }}>Pro Details</Text></Text>
-                                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                                        <View style={{ flexDirection: "row", flex: 2 }}>
-                                            <View style={styles.imageContainer}>
-                                                <Image source={{ uri: orderDetails.proImage }} style={styles.proImage} />
-                                            </View>
-                                            <View style={styles.proTextContainer}>
-                                                <Text style={[styles.description, { textAlign: 'left', fontWeight: "bold" }]}>{orderDetails.proName}</Text>
-                                            </View>
-                                        </View>
-                                        {
-                                            orderDetails.proPhone && orderDetails.status === "in progress" &&
-                                            <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-                                                <TouchableOpacity
-                                                    onPress={() => {
-                                                        Linking.openURL(`tel:${orderDetails.proPhone}`)
-                                                    }}
-                                                    style={styles.button}
-                                                >
-                                                    <Feather
-                                                        name="phone"
-                                                        color="white"
-                                                        size={30}
-                                                    />
-                                                    <Text style={{ ...DefaultStyles.titleText, marginHorizontal: 10, color: "white" }}>Call</Text>
-                                                </TouchableOpacity>
 
-                                            </View>
-                                        }
-                                    </View>
-                                </Fragment>
-                        }
-                    </Card>
-                }
                 {
-                    orderDetails.status !== "cancelled" && <Text style={{ ...styles.title, marginVertical: 15 }}>Connection Fee: <Text style={{ fontFamily: 'poppins-bold' }}>KES.{totalAmount.toFixed(2)}</Text></Text>
+                    // orderDetails.status !== "cancelled" && <Text style={{ ...styles.title, marginVertical: 15 }}>Connection Fee: <Text style={{ fontFamily: 'poppins-bold' }}>KES.{totalAmount.toFixed(2)}</Text></Text>
                 }
             </View>
         </Fragment>

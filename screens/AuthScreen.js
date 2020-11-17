@@ -11,6 +11,7 @@ import {
     TouchableNativeFeedback,
     Platform,
     Alert,
+    Linking
 } from 'react-native';
 import * as facebook from 'expo-facebook';
 import * as firebase from 'firebase';
@@ -155,7 +156,7 @@ const AuthScreen = props => {
     const TouchableCmp = Platform.OS === 'ios' ? TouchableOpacity : TouchableNativeFeedback
     return (
         <View style={{ flex: 1, padding: 20 }}>
-            <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={100} style={{ flex: 1 }}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={150} style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.screen}>
                     <View style={styles.imageContainer}>
                         <Image style={styles.image} source={require('../assets/jobo-icon.png')} resizeMode="contain" />
@@ -242,7 +243,13 @@ const AuthScreen = props => {
                     <Spinner />
             }
             <View style={{ paddingHorizontal: 30, bottom: -10 }}>
-                <Text style={styles.terms}>By signing up, you agree to our Terms and Conditions and Privacy Policy</Text>
+                <Text style={styles.terms}>
+                    By signing up, you agree to our Terms and Conditions and
+                    <Text> </Text>  
+                    <Text style={{ color: "blue" }} onPress={() => Linking.openURL("https://drive.google.com/file/d/1e16-vnvBi7P0sSzomvUXRnA1pYdLPoD0/view?usp=sharing")}>
+                         Privacy Policy
+                    </Text>
+                </Text>
             </View>
         </View>
 
@@ -280,7 +287,7 @@ const styles = StyleSheet.create({
     terms: {
         textAlign: 'center',
         fontFamily: 'poppins-regular',
-        fontSize: 12,
+        fontSize: 14,
         color: '#505050'
     },
     textInput: {
