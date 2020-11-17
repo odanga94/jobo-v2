@@ -257,7 +257,7 @@ const CheckOutScreen = props => {
                     <Text style={{ ...DefaultStyles.titleText, color: "#505050" }}>Payment Note:</Text>
                 </View>
                 <Text style={{ ...DefaultStyles.bodyText, fontSize: 14 }}>
-                    Currently we only accept payments via M-Pesa. Once the job is done kindly pay to the till number below.
+                    Currently we only accept payments via M-Pesa. Once the job is done, kindly pay to the till number below.
                 </Text>
                 <View style={styles.mpesaContainer}>
                     <Image

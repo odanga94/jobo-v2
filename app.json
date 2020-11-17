@@ -4,7 +4,6 @@
     "slug": "jobo",
     "description": "Your one-stop app for Fundis.",
     "privacy": "public",
-    "sdkVersion": "36.0.0",
     "platforms": [
       "ios",
       "android"

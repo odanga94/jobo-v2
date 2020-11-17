@@ -28,7 +28,7 @@ if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
-facebook.initializeAsync('918386268604007', 'Jobo');
+facebook.initializeAsync({ appId: '918386268604007', appName: 'Jobo' });
 
 const fetchFonts = () => {
   return Font.loadAsync({

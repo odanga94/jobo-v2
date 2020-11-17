@@ -156,7 +156,7 @@ const AuthScreen = props => {
     const TouchableCmp = Platform.OS === 'ios' ? TouchableOpacity : TouchableNativeFeedback
     return (
         <View style={{ flex: 1, padding: 20 }}>
-            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={150} style={{ flex: 1 }}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={height / 4.5} style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.screen}>
                     <View style={styles.imageContainer}>
                         <Image style={styles.image} source={require('../assets/jobo-icon.png')} resizeMode="contain" />

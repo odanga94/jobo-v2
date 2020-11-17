@@ -210,7 +210,7 @@ PickLocationScreen.navigationOptions = navData => {
 
     return {
         headerTitle: 'Pick a Location',
-        headerRight: (
+        headerRight: () => (
             <HeaderButtons HeaderButtonComponent={IoniconHeaderButton}>
                 <Item
                     title="Save"
