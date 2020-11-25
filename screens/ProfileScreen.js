@@ -58,6 +58,7 @@ const formReducer = (state, action) => {
     }
     return state;
 }
+
 const ProfileScreen = props => {
     const [isLoading, setIsLoading] = useState(false);
     const [profileLoading, setProfileLoading] = useState(false);
@@ -356,7 +357,7 @@ const ProfileScreen = props => {
                                 style={{ backgroundColor: '#ff726f', width: width / 2.5, height: 50 }}
                             >
                                 Cancel
-                        </MainButton>
+                            </MainButton>
                             <MainButton
                                 style={{ width: width / 2.5, height: 50 }}
                                 onPress={() => {
@@ -364,7 +365,7 @@ const ProfileScreen = props => {
                                 }}
                             >
                                 Save
-                        </MainButton>
+                            </MainButton>
                         </View> :
                         null
                 }
@@ -423,8 +424,8 @@ const styles = StyleSheet.create({
     screen: {
         flex: 1,
         padding: 20,
-        height: height,
-        width: '100%',
+        //height: height,
+        //width: '100%',
         justifyContent: 'space-between'
     },
     profileContainer: {

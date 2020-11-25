@@ -14,9 +14,9 @@ export const PROS = [
     new Pro('p11', 'Graphic Designer', require('../assets/pro-images/graphic-design.png')),
     new Pro('p12', 'Tiles Expert', require('../assets/pro-images/tiles-expert.png')),
     new Pro('p13', 'Builder', require('../assets/pro-images/builder.png')),
-    new Pro('p14', 'Wellness', require('../assets/pro-images/Fitness.png')),
-    new Pro('p15', 'Cook', require('../assets/pro-images/Cook.png')),
-    new Pro('p16', 'Carpenter', require('../assets/pro-images/Carpenter.png')),
+    //new Pro('p14', 'Wellness', require('../assets/pro-images/Fitness.png')),
+    //new Pro('p15', 'Cook', require('../assets/pro-images/Cook.png')),
+    //new Pro('p16', 'Carpenter', require('../assets/pro-images/Carpenter.png')),
     new Pro('p17', 'Pest Control', require('../assets/pro-images/Pest-Control.png')),
 ];
 

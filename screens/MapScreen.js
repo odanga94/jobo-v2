@@ -66,7 +66,7 @@ const MapScreen = props => {
                     valueToUpdate: "status",
                     value: dataSnapShot.val()
                 });
-                if (dataSnapShot.val() === "in progress" || "completed"){
+                if (dataSnapShot.val() === "in progress" || "completed") {
                     const assignedProIdSnapshot = await firebase.database().ref(`orders/${userId}/${currentJobOrderId}/assignedProId`).once("value");
                     const assignedProId = assignedProIdSnapshot.val();
                     dispatch({
@@ -76,7 +76,7 @@ const MapScreen = props => {
                         value: assignedProId
                     });
                 }
-                if (dataSnapShot.val() === "completed") {
+                if (dataSnapShot.val() === "completed" || dataSnapShot.val() === "cancelled") {
                     dispatch({
                         type: currentJobActions.DELETE_CURRENT_JOB
                     });
@@ -91,7 +91,7 @@ const MapScreen = props => {
         if (currentJobOrderId) {
             currentJobRef.on("child_changed", onChildChanged);
         }
-        
+
         return () => {
             currentJobRef.off("child_changed", onChildChanged);
         }
@@ -102,11 +102,11 @@ const MapScreen = props => {
         if (currentOrder && (currentOrder.orderDetails.status === "in progress" || currentOrder.orderDetails.status === "completed") && !currentOrder.orderDetails.proName && currentOrder.orderDetails.assignedProId) {
             //console.log(currentOrder)
             fetchProDetails(currentOrder.orderDetails.problemType, currentOrder.orderDetails.assignedProId, currentJobOrderId)
-        } 
+        }
     }, [currentOrder]);
 
     useEffect(() => {
-        if(currentJobOrderId && !fromCheckout){
+        if (currentJobOrderId && !fromCheckout) {
             fetchCurrentJobDetails();
         }
     }, [fromCheckout, currentJobOrderId]);
@@ -216,9 +216,9 @@ const MapScreen = props => {
         let prosArr = [];
         const dataSnapshot = await firebase.database().ref('pros').once('value');
         const results = dataSnapshot.val();
-        for (let category in results){
+        for (let category in results) {
             const pros = results[category];
-            for (let proId in pros){
+            for (let proId in pros) {
                 const proDetails = {
                     proId,
                     category: category.slice(0, 1).toUpperCase() + category.slice(1),
@@ -307,7 +307,7 @@ const MapScreen = props => {
                         <View style={{ flex: 1, justifyContent: "space-between" }}>
                             <Text style={{ ...defaultStyles.titleText }}>Welcome to Jobo! Your one-stop app for Fundis.</Text>
                             <Text style={{ ...defaultStyles.bodyText }}>{promotionalMessage}</Text>
-                            {!hasOrders && <Text style={{...defaultStyles.bodyText, marginVertical: 2}}>Get 25% discount on your first order!!</Text>}
+                            {!hasOrders && <Text style={{ ...defaultStyles.bodyText, marginVertical: 2 }}>Get 25% discount on your first order!!</Text>}
                             <MainButton onPress={() => {
                                 props.navigation.navigate('Services');
                             }}>View Services</MainButton>

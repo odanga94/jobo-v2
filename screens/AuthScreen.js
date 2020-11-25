@@ -155,7 +155,7 @@ const AuthScreen = props => {
 
     const TouchableCmp = Platform.OS === 'ios' ? TouchableOpacity : TouchableNativeFeedback
     return (
-        <View style={{ flex: 1, padding: 20 }}>
+        <View style={{ flex: 1, padding: 20, justifyContent: "space-between" }}>
             <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={height / 4.5} style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.screen}>
                     <View style={styles.imageContainer}>

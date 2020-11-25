@@ -289,8 +289,8 @@ const ProblemDetailsScreen = props => {
     }
 
     return (
-        <View style={{ padding: 10, backgroundColor: "white", flex: 1 }}>
-            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={height/4.5} style={{ flex: 1 }}>
+        <View style={{ padding: 10, backgroundColor: "white", flex: 1, justifyContent: "space-between" }}>
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={50}  style={{ flex: 1 }}>
                 <ScrollView contentContainerStyle={styles.screen}>
                     <Fragment>
                         {
