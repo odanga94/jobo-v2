@@ -252,21 +252,8 @@ const CheckOutScreen = props => {
                 date={getreadableDate(orderDetails.dateRequested)}
                 totalAmount={connectionFee}
             />
-            <View style={{ margin: 20 }}>
-                <View style={styles.paymentTextContainer}>
-                    <Text style={{ ...DefaultStyles.titleText, color: "#505050" }}>Payment Note:</Text>
-                </View>
-                <Text style={{ ...DefaultStyles.bodyText, fontSize: 14 }}>
-                    Currently we only accept payments via M-Pesa. Once the job is done, kindly pay to the till number below.
-                </Text>
-                <View style={styles.mpesaContainer}>
-                    <Image
-                        style={styles.image}
-                        source={require('../assets/mpesa-till.jpg')}
-                        resizeMode="contain"
-                    />
-                </View>
-                {/* <View style={styles.paymentContainer}>
+            {/* <View style={{ margin: 20 }}>
+                <View style={styles.paymentContainer}>
                     <TouchableOpacity
                         onPress={() => {
                             addOrder("mpesa");
@@ -294,8 +281,8 @@ const CheckOutScreen = props => {
                         />
                         <Text style={{ ...DefaultStyles.bodyText, marginLeft: 10, fontSize: 16 }}>Card</Text>
                     </TouchableOpacity>
-                </View> */}
-            </View>
+                </View> 
+            </View> */}
             <View style={styles.buttonContainer}>
                 <MainButton
                     onPress={() => {

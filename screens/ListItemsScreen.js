@@ -115,7 +115,7 @@ const ListItemsScreen = props => {
                             {
                                 itemsState[index].selected ?
                                 <Text style={{...DefaultStyles.bodyText, color: Colors.secondary}}>{item}</Text> :
-                                <Text style={DefaultStyles.bodyText}>{item}</Text> 
+                                <Text style={{...DefaultStyles.bodyText, color: "black"}}>{item}</Text> 
                             }    
                         </Left>
                         {

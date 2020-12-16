@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Alert } from 'react-native'
+import {
+    ScrollView,
+    Alert,
+} from 'react-native'
 import { useSelector, useDispatch } from 'react-redux';
 import * as firebase from 'firebase';
 
@@ -35,7 +38,7 @@ const OrderDetailScreen = props => {
                     const assignedProId = assignedProIdSnapshot.val();
                     dispatch({
                         type: UPDATE_ORDER,
-                        orderId: currentJobOrderId,
+                        orderId: orderId,
                         valueToUpdate: "assignedProId",
                         value: assignedProId
                     });
@@ -44,6 +47,16 @@ const OrderDetailScreen = props => {
                     dispatch({
                         type: DELETE_CURRENT_JOB
                     });
+                }
+                if (dataSnapShot.val() === "completed") {
+                    const amountPaidSnapshot = await firebase.database().ref(`orders/${userId}/${orderId}/amountPaid`).once("value");
+                    const amountPaid = amountPaidSnapshot.val();
+                    dispatch({
+                        type: UPDATE_ORDER,
+                        orderId: orderId,
+                        valueToUpdate: "amountPaid",
+                        value: amountPaid
+                    })
                 }
             } else if (dataSnapShot.key === "assignedProId") {
                 if ((selectedOrder.orderDetails.status === "in progress" || selectedOrder.orderDetails.status === "completed") && !selectedOrder.orderDetails.proName && selectedOrder.orderDetails.assignedProId) {

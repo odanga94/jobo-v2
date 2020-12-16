@@ -49,7 +49,11 @@ const OrderItem = props => {
                 <View style={{ /*height: '20%',*/ marginBottom: 10 }}>
                     <View style={styles.details}>
                         <Text style={styles.title}>{formatToSentenceCase(orderDetails.problemType)}</Text>
-                        {/* <Text style={styles.price}>KES. {orderDetails.status === "cancelled" ? Number(0).toFixed(2) : props.price.toFixed(2)}</Text> */}
+                        {
+                            orderDetails.status === "completed" && orderDetails.amountPaid ?
+                            <Text style={styles.price}>Ksh.{orderDetails.amountPaid.toFixed(2)}</Text> :
+                            null
+                        }
                     </View>
                     <Text style={DefaultStyles.bodyText}>status:  <Text style={{color: orderDetails.status === "cancelled" ? "red" : Colors.secondary}}>{formatToSentenceCase(orderDetails.status)}</Text></Text>
                 </View>
@@ -89,7 +93,8 @@ const styles = StyleSheet.create({
     },
     price: {
         fontSize: 16,
-        fontFamily: 'poppins-bold'
+        fontFamily: 'poppins-bold',
+        color: "#505050"
     },
     actions: {
         alignItems: 'center',

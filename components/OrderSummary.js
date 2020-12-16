@@ -11,6 +11,7 @@ import {
 import { Feather } from '@expo/vector-icons';
 
 import Card from '../components/UI/Card';
+import CustomAccordion from '../components/UI/CustomAccordion';
 
 import ENV from '../env';
 import Colors from '../constants/colors';
@@ -18,6 +19,10 @@ import DefaultStyles from '../constants/default-styles';
 import Spinner from './UI/Spinner';
 
 const { width, height } = Dimensions.get('window');
+
+const dataArray = [
+    { title: "Payment Note", content: "Lorem ipsum dolor sit amet" },
+];
 
 const OrderSummary = props => {
     const { orderDetails, date, totalAmount, problemImage } = props;
@@ -36,6 +41,31 @@ const OrderSummary = props => {
                         <Text style={styles.datePrice}>{date}</Text>
                     </View>
                     <Text style={styles.title}>status: <Text style={{ fontFamily: 'poppins-bold', color: orderDetails.status === "cancelled" ? "red" : Colors.secondary }}>{formatToSentenceCase(orderDetails.status)}</Text></Text>
+                    {
+                        orderDetails.status === "completed" && orderDetails.amountPaid ?
+                        <Text style={styles.title}>Amount Paid: <Text style={styles.price}>Ksh.{orderDetails.amountPaid.toFixed(2)}</Text></Text> :
+                        null
+                    }
+                    {
+                        orderDetails.status === "pending" || orderDetails.status === "in progress" ?
+                        <CustomAccordion
+                            dataArray={dataArray}
+                        >
+                            <View style={{ margin: 10 }}>
+                                <Text style={{ ...DefaultStyles.bodyText, fontSize: 14 }}>
+                                    Currently we only accept payments via M-Pesa. Once the job is done, kindly pay to the till number below.
+                                </Text>
+                                <View style={styles.mpesaContainer}>
+                                    <Image
+                                        style={styles.mpesaImage}
+                                        source={require('../assets/mpesa-till.jpg')}
+                                        resizeMode="contain"
+                                    />
+                                </View>
+                            </View>
+                        </CustomAccordion> :
+                        null
+                    }
                 </View>
                 {
                     (orderDetails.status === "in progress" || orderDetails.status === "completed") &&
@@ -189,6 +219,11 @@ const styles = StyleSheet.create({
         fontFamily: 'poppins-bold',
 
     },
+    price: {
+        fontSize: 16,
+        fontFamily: 'poppins-bold',
+        color: "#505050"
+    },
     title: {
         fontSize: 16,
         fontFamily: 'poppins-regular',
@@ -221,6 +256,22 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         marginLeft: 5
     },
+    paymentTextContainer: {
+        borderBottomColor: "#505050",
+        borderBottomWidth: 1,
+        width: width / 2.5,
+        marginBottom: 10
+    },
+    mpesaContainer: {
+        width: width / 2,
+        maxHeight: width / 2,
+        //marginTop: 5
+    },
+    mpesaImage: {
+        width: '100%',
+        height: '100%'
+        //maxHeight: width / 3
+    }
 });
 
 export default OrderSummary;

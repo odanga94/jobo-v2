@@ -81,6 +81,16 @@ const MapScreen = props => {
                         type: currentJobActions.DELETE_CURRENT_JOB
                     });
                 }
+                if (dataSnapShot.val() === "completed") {
+                    const amountPaidSnapshot = await firebase.database().ref(`orders/${userId}/${currentJobOrderId}/amountPaid`).once("value");
+                    const amountPaid = amountPaidSnapshot.val();
+                    dispatch({
+                        type: UPDATE_ORDER,
+                        orderId: currentJobOrderId,
+                        valueToUpdate: "amountPaid",
+                        value: amountPaid
+                    })
+                }
             } else if (dataSnapShot.key === "assignedProId") {
                 if (currentOrder && (currentOrder.orderDetails.status === "in progress" || currentOrder.orderDetails.status === "completed") && !currentOrder.orderDetails.proName && currentOrder.orderDetails.assignedProId) {
                     //console.log(currentOrder)
