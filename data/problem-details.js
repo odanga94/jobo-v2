@@ -131,7 +131,7 @@ export const TaxDetails = new ProblemDetails(
     true
 );
 
-export const CarpenterDetails = new ProblemDetails(
+export const CarpentryDetails = new ProblemDetails(
     "carpenting",
     { fieldName: "What needs to be fixed ?", items: ["Bed", "Chairs", "Sofa", "Shelves", "Door", "Windows", "Stairs", "Others"] },
     undefined,

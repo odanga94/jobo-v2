@@ -31,7 +31,7 @@ import {
     GardeningDetails,
     CookingDetails,
     TaxDetails,
-    CarpenterDetails,
+    CarpentryDetails,
     WellnessDetails,
     EventsDetails,
     BuilderDetails,
@@ -132,7 +132,7 @@ const ProblemDetailsScreen = props => {
                 setServiceDetails(CookingDetails);
                 return;
             case "p16":
-                setServiceDetails(CarpenterDetails)
+                setServiceDetails(CarpentryDetails)
                 return;
             case "p17":
                 setServiceDetails(PestControlDetails);
@@ -213,6 +213,10 @@ const ProblemDetailsScreen = props => {
         }
         if (!clientPhone.trim()) {
             Alert.alert('Wrong Input!', 'Please enter a valid phone number to contact you on.', [{ text: 'Okay' }]);
+            return;
+        }
+        if (!clientLocation || !clientAddress){
+            Alert.alert('Location is Required', 'Please input your location so that we can assign a Pro nearest to you. Thank you 😊', [{ text: 'Okay' }]);
             return;
         }
         navigation.navigate('Check Out', {
